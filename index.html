@@ -356,9 +356,27 @@ function showQuestion() {
   document.getElementById('score-badge').textContent = `${sessionCorrect} / ${QUESTIONS_PER_SESSION}`;
   document.getElementById('game-progress-fill').style.width = `${sessionIndex / QUESTIONS_PER_SESSION * 100}%`;
   
-  // ▼ 変更済：数字を無視して名前だけで画像を読み込む
-  const imgPath = `images/${plant['植物名（流通名）']}.jpg`;
-  document.getElementById('plant-photo').innerHTML = `<img src="${imgPath}" alt="${plant['植物名（流通名）']}" onerror="this.parentNode.innerHTML='<div class=\\'photo-placeholder\\'>🌿</div>'" style="width:100%;height:100%;object-fit:contain;padding:4px">`;
+  // ▼ Macの濁点問題（ド・パなど）と スラッシュ（/）問題を両方自動解決する
+  const plantName = plant['植物名（流通名）'];
+  const safeName = plantName.replace(/\//g, '／'); // スラッシュ対策
+  const photoEl = document.getElementById('plant-photo');
+  photoEl.innerHTML = ''; 
+
+  const img = document.createElement('img');
+  img.src = `images/${safeName}.jpg`;
+  img.alt = plantName;
+  img.style.cssText = 'width:100%;height:100%;object-fit:contain;padding:4px';
+
+  // 普通の名前で画像が出なかったら、Mac用の特殊な濁点（NFD）に変換して再トライする
+  img.onerror = function() {
+    if (!this.dataset.retried) {
+      this.dataset.retried = 'true';
+      this.src = `images/${safeName.normalize('NFD')}.jpg`;
+    } else {
+      photoEl.innerHTML = '<div class="photo-placeholder">🌿</div>';
+    }
+  };
+  photoEl.appendChild(img);
 
   const hintEl = document.getElementById('plant-name-hint');
   if (lv.showName) { hintEl.style.display = 'block'; hintEl.textContent = `🌿 ${plant['植物名（流通名）']}`; } else { hintEl.style.display = 'none'; }
