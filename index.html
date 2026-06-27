@@ -1,0 +1,486 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>🌿 植物マスター — garage</title>
+<style>
+:root {
+  --bg: #f5f3ef;
+  --surface: #ffffff;
+  --border: #e2ddd6;
+  --text: #1a1a18;
+  --sub: #6b6b62;
+  --green: #3d6b4f;
+  --green-l: #e8f0eb;
+  --green-m: #b5cfc0;
+  --amber: #c8862a;
+  --amber-l: #fdf3e3;
+  --red: #c0392b;
+  --red-l: #fdecea;
+  --gold: #f0b429;
+  --r: 14px;
+  --shadow: 0 2px 16px rgba(0,0,0,0.09);
+}
+* { box-sizing: border-box; margin: 0; padding: 0; }
+body { font-family: 'Hiragino Kaku Gothic ProN','Noto Sans JP',sans-serif; background: var(--bg); color: var(--text); min-height: 100vh; }
+
+/* ヘッダー */
+header {
+  background: var(--green);
+  color: white;
+  padding: 12px 20px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  position: sticky; top: 0; z-index: 100;
+}
+header h1 { font-size: 15px; font-weight: 700; }
+.streak-badge {
+  background: rgba(255,255,255,0.15);
+  border-radius: 20px;
+  padding: 4px 12px;
+  font-size: 13px; font-weight: 700;
+}
+
+/* トップ画面 */
+#screen-top { padding: 20px; }
+.top-title { font-size: 26px; font-weight: 800; text-align: center; margin: 20px 0 4px; color: var(--green); }
+.top-sub { text-align: center; color: var(--sub); font-size: 13px; margin-bottom: 28px; }
+
+.stats-row {
+  display: grid; grid-template-columns: 1fr 1fr 1fr;
+  gap: 10px; margin-bottom: 24px;
+}
+.stat-card {
+  background: var(--surface); border-radius: var(--r);
+  padding: 14px 10px; text-align: center;
+  border: 1px solid var(--border); box-shadow: var(--shadow);
+}
+.stat-num { font-size: 26px; font-weight: 800; color: var(--green); }
+.stat-label { font-size: 11px; color: var(--sub); margin-top: 2px; }
+
+.record-btn {
+  width: 100%; padding: 14px; border-radius: 12px; border: 1.5px solid var(--border);
+  background: var(--surface); color: var(--text); font-size: 15px; font-weight: 700;
+  cursor: pointer; margin-bottom: 24px; display: flex; align-items: center; justify-content: center; gap: 8px;
+  box-shadow: var(--shadow); transition: all 0.2s;
+}
+.record-btn:hover { border-color: var(--green-m); background: var(--green-l); color: var(--green); }
+
+/* レベル選択 */
+.level-list { display: flex; flex-direction: column; gap: 10px; margin-bottom: 24px; }
+.level-card {
+  background: var(--surface); border-radius: var(--r); border: 1.5px solid var(--border);
+  padding: 16px 18px; cursor: pointer; transition: all 0.2s; display: flex; align-items: center; gap: 14px;
+  box-shadow: var(--shadow);
+}
+.level-card:hover { border-color: var(--green-m); transform: translateY(-1px); }
+.level-card.locked { opacity: 0.4; cursor: not-allowed; }
+.level-card.current { border-color: var(--green); border-width: 2px; }
+.level-icon { font-size: 28px; flex-shrink: 0; }
+.level-info { flex: 1; }
+.level-name { font-size: 15px; font-weight: 700; margin-bottom: 3px; }
+.level-desc { font-size: 12px; color: var(--sub); }
+.level-stars { font-size: 16px; }
+.level-progress-wrap { height: 4px; background: var(--border); border-radius: 2px; margin-top: 6px; overflow: hidden; }
+.level-progress { height: 100%; background: var(--green); border-radius: 2px; transition: width 0.5s; }
+
+/* ゲーム画面 */
+#screen-game { display: none; padding: 0 0 30px; }
+.game-header { background: var(--surface); border-bottom: 1px solid var(--border); padding: 12px 20px; display: flex; align-items: center; gap: 12px; }
+.back-btn { background: none; border: none; font-size: 20px; cursor: pointer; padding: 0 4px; }
+.game-title { font-size: 14px; font-weight: 700; flex: 1; }
+.score-badge { background: var(--green-l); color: var(--green); border-radius: 20px; padding: 4px 12px; font-size: 13px; font-weight: 700; }
+.game-progress { height: 5px; background: var(--border); }
+.game-progress-fill { height: 100%; background: var(--green); transition: width 0.4s ease; }
+
+/* 問題カード */
+.question-wrap { padding: 16px 20px; }
+.plant-photo { width: 100%; height: 240px; border-radius: var(--r); overflow: hidden; background: var(--green-l); display: flex; align-items: center; justify-content: center; margin-bottom: 16px; position: relative; }
+.plant-photo img { width: 100%; height: 100%; object-fit: contain; padding: 4px; }
+.plant-photo .photo-placeholder { font-size: 60px; }
+.question-label { font-size: 12px; color: var(--sub); text-transform: uppercase; letter-spacing: 0.08em; margin-bottom: 6px; }
+.question-text { font-size: 18px; font-weight: 700; margin-bottom: 20px; line-height: 1.4; }
+.plant-name-hint { font-size: 13px; color: var(--sub); margin-bottom: 16px; background: var(--green-l); padding: 8px 12px; border-radius: 8px; }
+
+/* 選択肢 */
+.choices { display: flex; flex-direction: column; gap: 10px; }
+.choice-btn { width: 100%; padding: 14px 16px; border-radius: 12px; border: 1.5px solid var(--border); background: var(--surface); font-size: 14px; color: var(--text); cursor: pointer; text-align: left; transition: all 0.15s; line-height: 1.4; }
+.choice-btn:hover:not(:disabled) { border-color: var(--green-m); background: var(--green-l); }
+.choice-btn.correct { border-color: var(--green); background: var(--green-l); color: var(--green); font-weight: 700; }
+.choice-btn.wrong { border-color: var(--red); background: var(--red-l); color: var(--red); }
+.choice-btn:disabled { cursor: default; }
+
+/* フィードバック */
+.feedback { display: none; margin-top: 16px; border-radius: var(--r); padding: 14px 16px; }
+.feedback.correct { background: var(--green-l); border: 1px solid var(--green-m); }
+.feedback.wrong { background: var(--amber-l); border: 1px solid #e6c87a; }
+.feedback-title { font-size: 16px; font-weight: 800; margin-bottom: 6px; }
+.feedback.correct .feedback-title { color: var(--green); }
+.feedback.wrong .feedback-title { color: var(--amber); }
+.feedback-desc { font-size: 13px; color: var(--text); line-height: 1.6; }
+
+.next-btn { width: 100%; margin-top: 14px; padding: 14px; border-radius: 12px; border: none; background: var(--green); color: white; font-size: 15px; font-weight: 700; cursor: pointer; display: none; }
+
+/* 結果画面 */
+#screen-result { display: none; padding: 30px 20px; text-align: center; }
+.result-emoji { font-size: 64px; margin-bottom: 16px; }
+.result-title { font-size: 26px; font-weight: 800; margin-bottom: 8px; color: var(--green); }
+.result-sub { font-size: 14px; color: var(--sub); margin-bottom: 28px; line-height: 1.6; }
+.result-score { background: var(--surface); border-radius: var(--r); padding: 20px; margin-bottom: 20px; border: 1px solid var(--border); box-shadow: var(--shadow); }
+.result-score-num { font-size: 48px; font-weight: 800; color: var(--green); }
+.result-score-label { font-size: 13px; color: var(--sub); }
+.result-btn { width: 100%; padding: 14px; border-radius: 12px; border: none; font-size: 15px; font-weight: 700; cursor: pointer; margin-bottom: 10px; }
+.result-btn.primary { background: var(--green); color: white; }
+.result-btn.secondary { background: var(--surface); color: var(--text); border: 1.5px solid var(--border); }
+
+/* 学習記録画面 */
+#screen-record { display: none; padding: 0 0 30px; }
+.record-wrap { padding: 20px; }
+.record-section-title { font-size: 15px; font-weight: 800; margin: 24px 0 12px; padding-bottom: 6px; border-bottom: 2px solid var(--border); }
+.record-item { background: var(--surface); padding: 12px 14px; border-radius: 8px; border: 1px solid var(--border); margin-bottom: 8px; display: flex; justify-content: space-between; align-items: center; }
+.record-name { font-size: 14px; font-weight: 700; color: var(--text); margin-bottom: 4px; }
+.record-stats { font-size: 12px; color: var(--sub); }
+.badge-weak { background: var(--red-l); color: var(--red); padding: 3px 6px; border-radius: 4px; font-size: 11px; font-weight: 700; }
+.badge-master { background: var(--green-l); color: var(--green); padding: 3px 6px; border-radius: 4px; font-size: 11px; font-weight: 700; }
+.badge-learning { background: var(--amber-l); color: var(--amber); padding: 3px 6px; border-radius: 4px; font-size: 11px; font-weight: 700; }
+
+/* 演出用 */
+.streak-popup { position: fixed; top: 80px; left: 50%; transform: translateX(-50%) translateY(-20px); background: var(--gold); color: white; border-radius: 24px; padding: 8px 20px; font-size: 15px; font-weight: 800; opacity: 0; transition: all 0.3s; pointer-events: none; z-index: 999; }
+.streak-popup.show { opacity: 1; transform: translateX(-50%) translateY(0); }
+.levelup-overlay { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.7); z-index: 500; align-items: center; justify-content: center; }
+.levelup-overlay.show { display: flex; }
+.levelup-box { background: var(--surface); border-radius: 24px; padding: 40px 32px; text-align: center; max-width: 300px; width: 90%; animation: popIn 0.4s ease; }
+@keyframes popIn { from { transform: scale(0.8); opacity: 0; } to { transform: scale(1); opacity: 1; } }
+.levelup-emoji { font-size: 64px; margin-bottom: 12px; }
+.levelup-title { font-size: 24px; font-weight: 800; color: var(--green); margin-bottom: 8px; }
+.levelup-desc { font-size: 14px; color: var(--sub); margin-bottom: 20px; }
+.levelup-btn { width: 100%; padding: 13px; border-radius: 12px; border: none; background: var(--green); color: white; font-size: 15px; font-weight: 700; cursor: pointer; }
+</style>
+</head>
+<body>
+
+<header>
+  <h1>🌿 植物マスター</h1>
+  <div class="streak-badge" id="header-streak">🔥 0連続</div>
+</header>
+
+<div class="streak-popup" id="streak-popup"></div>
+<div class="levelup-overlay" id="levelup-overlay">
+  <div class="levelup-box">
+    <div class="levelup-emoji" id="levelup-emoji">🎉</div>
+    <div class="levelup-title" id="levelup-title">レベルアップ！</div>
+    <div class="levelup-desc" id="levelup-desc"></div>
+    <button class="levelup-btn" onclick="closeLevelup()">続ける！</button>
+  </div>
+</div>
+
+<!-- トップ画面 -->
+<div id="screen-top">
+  <div class="top-title">🌿 植物マスター</div>
+  <div class="top-sub">garage green study app</div>
+
+  <div class="stats-row">
+    <div class="stat-card">
+      <div class="stat-num" id="stat-mastered">0</div>
+      <div class="stat-label">マスター種</div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-num" id="stat-streak">0</div>
+      <div class="stat-label">最高連続</div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-num" id="stat-total">0</div>
+      <div class="stat-label">総正解数</div>
+    </div>
+  </div>
+
+  <button class="record-btn" onclick="showRecord()">📊 学習記録（植物図鑑）を見る</button>
+  <div class="level-list" id="level-list"></div>
+</div>
+
+<!-- ゲーム画面 -->
+<div id="screen-game">
+  <div class="game-header">
+    <button class="back-btn" onclick="goTop()">←</button>
+    <div class="game-title" id="game-title">Lv.1 名前を覚えよう</div>
+    <div class="score-badge" id="score-badge">0 / 10</div>
+  </div>
+  <div class="game-progress"><div class="game-progress-fill" id="game-progress-fill" style="width:0%"></div></div>
+  <div class="question-wrap">
+    <div class="plant-photo" id="plant-photo"><div class="photo-placeholder">🌿</div></div>
+    <div class="plant-name-hint" id="plant-name-hint" style="display:none"></div>
+    <div class="question-label">Q</div>
+    <div class="question-text" id="question-text"></div>
+    <div class="choices" id="choices"></div>
+    <div class="feedback" id="feedback">
+      <div class="feedback-title" id="feedback-title"></div>
+      <div class="feedback-desc" id="feedback-desc"></div>
+    </div>
+    <button class="next-btn" id="next-btn" onclick="nextQuestion()">次の問題へ →</button>
+  </div>
+</div>
+
+<!-- 結果画面 -->
+<div id="screen-result">
+  <div class="result-emoji" id="result-emoji">🎉</div>
+  <div class="result-title" id="result-title"></div>
+  <div class="result-sub" id="result-sub"></div>
+  <div class="result-score"><div class="result-score-num" id="result-score-num"></div><div class="result-score-label" id="result-score-label"></div></div>
+  <button class="result-btn primary" onclick="retrySession()">もう一度 🔄</button>
+  <button class="result-btn secondary" onclick="goTop()">レベル選択に戻る</button>
+</div>
+
+<!-- 学習記録画面 -->
+<div id="screen-record">
+  <div class="game-header">
+    <button class="back-btn" onclick="goTop()">←</button>
+    <div class="game-title">📊 学習記録（植物図鑑）</div>
+  </div>
+  <div class="record-wrap">
+    <div id="record-master-area"></div>
+    <div id="record-weak-area"></div>
+    <div id="record-learning-area"></div>
+    <div id="record-unstudied-area"></div>
+  </div>
+</div>
+
+<script>
+const LEVELS = [
+  { id: 1, name: '名前を覚えよう', icon: '📸', desc: '写真を見て植物名を答える', question: (p) => 'この植物の名前は？', answer: (p) => p['植物名（流通名）'], showName: false, wrongAnswers: (p, all) => shuffle(all.filter(x => x !== p)).slice(0,3).map(x => x['植物名（流通名）']), feedback: (p, correct) => correct ? `正解！${p['植物名（流通名）']}です。\n学名: ${p['学名'] || '—'}` : `正解は「${p['植物名（流通名）']}」でした。\n${p['機能性・効果'] || ''}`, },
+  { id: 2, name: '置き場所・日照', icon: '☀️', desc: '植物の名前を見て日照・置き場所を答える', question: (p) => `「${p['植物名（流通名）']}」の日照条件は？`, answer: (p) => p['耐陰性（日照条件）'], showName: true, wrongAnswers: (p, all) => shuffle(all.filter(x => x['耐陰性（日照条件）'] !== p['耐陰性（日照条件）'] && x['耐陰性（日照条件）'])).slice(0,3).map(x => x['耐陰性（日照条件）']), feedback: (p, correct) => correct ? `正解！日照: ${p['耐陰性（日照条件）']}\n置き場所: ${p['推奨置き場所'] || '—'}` : `正解は「${p['耐陰性（日照条件）']}」\n置き場所: ${p['推奨置き場所'] || '—'}`, },
+  { id: 3, name: '水やり・難易度', icon: '💧', desc: '水やり頻度と栽培難易度を答える', question: (p) => `「${p['植物名（流通名）']}」の水やりは？`, answer: (p) => p['水やりの頻度'], showName: true, wrongAnswers: (p, all) => shuffle(all.filter(x => x['水やりの頻度'] !== p['水やりの頻度'] && x['水やりの頻度'] && x['水やりの頻度'].length < 30)).slice(0,3).map(x => x['水やりの頻度']), feedback: (p, correct) => correct ? `正解！水やり: ${p['水やりの頻度']}\n難易度: ${p['栽培難易度'] || '—'}` : `正解は「${p['水やりの頻度']}」\n難易度: ${p['栽培難易度'] || '—'}`, },
+  { id: 4, name: 'ギフト・安全性', icon: '🎁', desc: 'ギフト適性・ペット安全性を答える', question: (p) => `「${p['植物名（流通名）']}」はペット・子供に？`, answer: (p) => (p['ペット・子供への安全性'] || '').split('（')[0].trim() || p['ペット・子供への安全性'], showName: true, wrongAnswers: (p, all) => { const ans = (p['ペット・子供への安全性'] || '').split('（')[0].trim(); return shuffle(['安全', '注意が必要', '危険（毒性あり）'].filter(x => x !== ans)).slice(0,3); }, feedback: (p, correct) => correct ? `正解！${p['ペット・子供への安全性'] || '—'}\nギフト: ${p['ギフト適性'] || '—'}` : `正解: ${p['ペット・子供への安全性'] || '—'}\nギフト: ${p['ギフト適性'] || '—'}`, },
+  { id: 5, name: '接客マスター', icon: '🏆', desc: '価格帯・季節の注意点を答える', question: (p) => `「${p['植物名（流通名）']}」のインテリアスタイルは？`, answer: (p) => (p['インテリアスタイル'] || '').split('/')[0].trim() || p['インテリアスタイル'], showName: true, wrongAnswers: (p, all) => { const ans = (p['インテリアスタイル'] || '').split('/')[0].trim(); return shuffle(all.filter(x => { const v = (x['インテリアスタイル'] || '').split('/')[0].trim(); return v && v !== ans && v.length < 20; })).slice(0,3).map(x => (x['インテリアスタイル'] || '').split('/')[0].trim()); }, feedback: (p, correct) => correct ? `正解！スタイル: ${p['インテリアスタイル'] || '—'}\n価格帯: ${p['価格帯（目安）'] || '—'}` : `正解: ${p['インテリアスタイル'] || '—'}\n価格帯: ${p['価格帯（目安）'] || '—'}`, },
+];
+
+const QUESTIONS_PER_SESSION = 10;
+const PASS_THRESHOLD = 7;
+
+let allPlants = [];
+let gameState = JSON.parse(localStorage.getItem('plant_game') || '{}');
+
+if (!gameState.levelProgress) gameState.levelProgress = {};
+if (!gameState.streak) gameState.streak = 0;
+if (!gameState.bestStreak) gameState.bestStreak = 0;
+if (!gameState.totalCorrect) gameState.totalCorrect = 0;
+// 新機能：植物ごとの成績を保存するオブジェクトを追加
+if (!gameState.plantStats) gameState.plantStats = {};
+
+let currentLevel = null; let sessionPlants = []; let sessionIndex = 0; let sessionCorrect = 0; let currentStreak = 0; let answered = false;
+
+async function loadCSV() {
+  try {
+    const res = await fetch('plants.csv');
+    const text = await res.text();
+    allPlants = parseCSV(text);
+    renderTop();
+  } catch(e) { console.error(e); alert('plants.csvが読み込めませんでした。'); }
+}
+function parseCSV(text) {
+  text = text.replace(/^\uFEFF/, '');
+  const lines = text.split(/\r?\n/).filter(l => l.trim());
+  const headers = parseCSVLine(lines[0]);
+  const result = [];
+  for (let i = 1; i < lines.length; i++) {
+    const vals = parseCSVLine(lines[i]);
+    if (!vals[0]) continue;
+    const obj = {}; headers.forEach((h, idx) => { if (h) obj[h] = vals[idx] || ''; });
+    result.push(obj);
+  }
+  return result;
+}
+function parseCSVLine(line) {
+  const result = []; let cur = ''; let inQuote = false;
+  for (let i = 0; i < line.length; i++) {
+    const c = line[i];
+    if (c === '"') { inQuote = !inQuote; }
+    else if (c === ',' && !inQuote) { result.push(cur.trim()); cur = ''; }
+    else { cur += c; }
+  }
+  result.push(cur.trim()); return result;
+}
+function shuffle(arr) { const a = [...arr]; for (let i = a.length - 1; i > 0; i--) { const j = Math.floor(Math.random() * (i + 1)); [a[i], a[j]] = [a[j], a[i]]; } return a; }
+
+function renderTop() {
+  document.getElementById('screen-top').style.display = 'block';
+  document.getElementById('screen-game').style.display = 'none';
+  document.getElementById('screen-result').style.display = 'none';
+  document.getElementById('screen-record').style.display = 'none';
+
+  // 「マスター種」の計算（2回以上正解＆正答率80%以上の植物数）
+  let masteredPlantsCount = 0;
+  Object.values(gameState.plantStats).forEach(stat => {
+    if (stat.correct >= 2 && (stat.correct / (stat.correct + stat.wrong)) >= 0.8) masteredPlantsCount++;
+  });
+  
+  document.getElementById('stat-mastered').textContent = masteredPlantsCount;
+  document.getElementById('stat-streak').textContent = gameState.bestStreak;
+  document.getElementById('stat-total').textContent = gameState.totalCorrect;
+  document.getElementById('header-streak').textContent = `🔥 ${currentStreak}連続`;
+
+  const listEl = document.getElementById('level-list');
+  listEl.innerHTML = LEVELS.map((lv, idx) => {
+    const prog = gameState.levelProgress[lv.id] || {};
+    const isLocked = idx > 0 && !(gameState.levelProgress[LEVELS[idx-1].id] || {}).cleared;
+    const isCleared = prog.cleared;
+    const isCurrent = !isLocked && !isCleared;
+    const best = prog.bestScore || 0;
+    const stars = best >= 10 ? '⭐⭐⭐' : best >= 8 ? '⭐⭐' : best >= PASS_THRESHOLD ? '⭐' : '';
+    return `
+      <div class="level-card ${isLocked ? 'locked' : ''} ${isCurrent ? 'current' : ''}" onclick="${isLocked ? '' : `startLevel(${lv.id})`}">
+        <div class="level-icon">${isLocked ? '🔒' : lv.icon}</div>
+        <div class="level-info">
+          <div class="level-name">Lv.${lv.id} ${lv.name} ${stars}</div><div class="level-desc">${lv.desc}</div>
+          ${isCleared ? `<div class="level-progress-wrap"><div class="level-progress" style="width:100%"></div></div>` : isCurrent && best > 0 ? `<div class="level-progress-wrap"><div class="level-progress" style="width:${best/10*100}%"></div></div>` : ''}
+        </div>
+        <div style="font-size:12px;color:var(--sub);flex-shrink:0">${isLocked ? '' : isCleared ? '✅クリア' : best > 0 ? `最高${best}/10` : ''}</div>
+      </div>`;
+  }).join('');
+}
+
+function startLevel(levelId) {
+  currentLevel = LEVELS.find(l => l.id === levelId);
+  sessionPlants = shuffle(allPlants).slice(0, QUESTIONS_PER_SESSION);
+  sessionIndex = 0; sessionCorrect = 0; answered = false;
+  document.getElementById('screen-top').style.display = 'none'; document.getElementById('screen-result').style.display = 'none';
+  document.getElementById('screen-game').style.display = 'block'; document.getElementById('game-title').textContent = `Lv.${currentLevel.id} ${currentLevel.name}`;
+  showQuestion();
+}
+
+function showQuestion() {
+  const plant = sessionPlants[sessionIndex];
+  if (!plant || !plant['植物名（流通名）']) { nextQuestion(); return; }
+  const lv = currentLevel; answered = false;
+  document.getElementById('score-badge').textContent = `${sessionCorrect} / ${QUESTIONS_PER_SESSION}`;
+  document.getElementById('game-progress-fill').style.width = `${sessionIndex / QUESTIONS_PER_SESSION * 100}%`;
+  
+  // ▼ 変更済：数字を無視して名前だけで画像を読み込む
+  const imgPath = `images/${plant['植物名（流通名）']}.jpg`;
+  document.getElementById('plant-photo').innerHTML = `<img src="${imgPath}" alt="${plant['植物名（流通名）']}" onerror="this.parentNode.innerHTML='<div class=\\'photo-placeholder\\'>🌿</div>'" style="width:100%;height:100%;object-fit:contain;padding:4px">`;
+
+  const hintEl = document.getElementById('plant-name-hint');
+  if (lv.showName) { hintEl.style.display = 'block'; hintEl.textContent = `🌿 ${plant['植物名（流通名）']}`; } else { hintEl.style.display = 'none'; }
+  
+  document.getElementById('question-text').textContent = lv.question(plant);
+  
+  const correct = (lv.answer(plant) || '不明').trim();
+  let wrongs = [...new Set(lv.wrongAnswers(plant, allPlants).filter(w => w && typeof w === 'string' && w.trim() && w.trim() !== correct))].slice(0, 3);
+  const _fb = ['その他', 'わからない', '該当なし']; let _fi = 0;
+  while (wrongs.length < 3) wrongs.push(_fb[_fi++] || 'その他');
+  const choices = shuffle([correct, ...wrongs]);
+  document.getElementById('choices').innerHTML = choices.map((c, i) => `<button class="choice-btn" onclick="selectAnswer('${escapeHtml(c)}', '${escapeHtml(correct)}', ${sessionIndex})">${['A', 'B', 'C', 'D'][i]}. ${c}</button>`).join('');
+  
+  const fb = document.getElementById('feedback'); fb.style.display = 'none'; fb.className = 'feedback';
+  document.getElementById('next-btn').style.display = 'none';
+}
+
+function escapeHtml(str) { return (str || '').replace(/'/g, "\\'").replace(/"/g, '&quot;'); }
+
+function selectAnswer(selected, correct, qIndex) {
+  if (answered || qIndex !== sessionIndex) return; answered = true;
+  const plant = sessionPlants[sessionIndex]; const isCorrect = selected === correct;
+  
+  document.querySelectorAll('.choice-btn').forEach(btn => {
+    btn.disabled = true; const btnText = btn.textContent.replace(/^[A-D]\. /, '').trim();
+    if (btnText === correct) btn.classList.add('correct');
+    else if (btnText === selected && !isCorrect) btn.classList.add('wrong');
+  });
+
+  // 学習記録の保存処理（正解数・不正解数をカウントアップ）
+  const pName = plant['植物名（流通名）'];
+  if (!gameState.plantStats[pName]) gameState.plantStats[pName] = { correct: 0, wrong: 0 };
+  if (isCorrect) {
+    gameState.plantStats[pName].correct++;
+    sessionCorrect++; currentStreak++; gameState.totalCorrect = (gameState.totalCorrect || 0) + 1;
+    if (currentStreak > gameState.bestStreak) gameState.bestStreak = currentStreak;
+    if (currentStreak >= 3) showStreakPopup();
+  } else {
+    gameState.plantStats[pName].wrong++;
+    currentStreak = 0;
+  }
+  document.getElementById('header-streak').textContent = `🔥 ${currentStreak}連続`;
+
+  const fb = document.getElementById('feedback'); fb.style.display = 'block'; fb.className = `feedback ${isCorrect ? 'correct' : 'wrong'}`;
+  document.getElementById('feedback-title').textContent = isCorrect ? '✅ 正解！' : '❌ 不正解';
+  document.getElementById('feedback-desc').textContent = currentLevel.feedback(plant, isCorrect);
+  document.getElementById('next-btn').style.display = 'block';
+  saveGame();
+}
+
+function nextQuestion() { sessionIndex++; if (sessionIndex >= QUESTIONS_PER_SESSION) { showResult(); } else { showQuestion(); } }
+
+function showResult() {
+  document.getElementById('screen-game').style.display = 'none'; document.getElementById('screen-result').style.display = 'block';
+  const lv = currentLevel; const score = sessionCorrect; const cleared = score >= PASS_THRESHOLD;
+  if (!gameState.levelProgress[lv.id]) gameState.levelProgress[lv.id] = {};
+  const prog = gameState.levelProgress[lv.id];
+  if (score > (prog.bestScore || 0)) prog.bestScore = score;
+  if (cleared && !prog.cleared) { prog.cleared = true; setTimeout(() => showLevelup(lv), 500); }
+  saveGame();
+  const pct = Math.round(score / QUESTIONS_PER_SESSION * 100);
+  document.getElementById('result-emoji').textContent = score === 10 ? '🏆' : score >= 8 ? '🎉' : cleared ? '✅' : '😅';
+  document.getElementById('result-title').textContent = score === 10 ? '完璧！パーフェクト！' : score >= 8 ? 'すごい！ほぼ完璧！' : cleared ? 'クリア！次のレベルへ進める！' : 'もう少し！再挑戦しよう';
+  document.getElementById('result-sub').textContent = cleared ? `Lv.${lv.id}「${lv.name}」クリア！` : `合格ライン: ${PASS_THRESHOLD}問正解`;
+  document.getElementById('result-score-num').textContent = `${score} / ${QUESTIONS_PER_SESSION}`;
+  document.getElementById('result-score-label').textContent = `正解率 ${pct}%`;
+}
+
+/* --- 新機能：学習記録画面の表示 --- */
+function showRecord() {
+  document.getElementById('screen-top').style.display = 'none';
+  document.getElementById('screen-record').style.display = 'block';
+
+  let masterHtml = '<div class="record-section-title" style="color:var(--green)">🌟 マスター済（得意な植物）</div>';
+  let weakHtml = '<div class="record-section-title" style="color:var(--red)">⚠️ 苦手（間違いが多い植物）</div>';
+  let learningHtml = '<div class="record-section-title" style="color:var(--amber)">📖 学習中（もっと解いてみよう）</div>';
+  let unstudiedHtml = '<div class="record-section-title" style="color:var(--sub)">🌱 未出題の植物</div>';
+
+  let masterCount = 0, weakCount = 0, learningCount = 0, unstudiedCount = 0;
+
+  allPlants.forEach(p => {
+    const name = p['植物名（流通名）'];
+    const stats = gameState.plantStats[name];
+
+    if (!stats || (stats.correct === 0 && stats.wrong === 0)) {
+      unstudiedHtml += `<div class="record-item"><div><div class="record-name">${name}</div><div class="record-stats">まだ出題されていません</div></div></div>`;
+      unstudiedCount++;
+    } else {
+      const total = stats.correct + stats.wrong;
+      const accuracy = stats.correct / total;
+
+      if (stats.correct >= 2 && accuracy >= 0.8) {
+        masterHtml += `<div class="record-item"><div><div class="record-name">${name}</div><span class="badge-master">マスター率 ${Math.round(accuracy*100)}%</span></div><div class="record-stats">⭕️${stats.correct} / ❌${stats.wrong}</div></div>`;
+        masterCount++;
+      } else if (accuracy <= 0.5) {
+        weakHtml += `<div class="record-item"><div><div class="record-name">${name}</div><span class="badge-weak">正答率 ${Math.round(accuracy*100)}%</span></div><div class="record-stats">⭕️${stats.correct} / ❌${stats.wrong}</div></div>`;
+        weakCount++;
+      } else {
+        learningHtml += `<div class="record-item"><div><div class="record-name">${name}</div><span class="badge-learning">正答率 ${Math.round(accuracy*100)}%</span></div><div class="record-stats">⭕️${stats.correct} / ❌${stats.wrong}</div></div>`;
+        learningCount++;
+      }
+    }
+  });
+
+  if(masterCount === 0) masterHtml += '<p style="font-size:13px; color:var(--sub); margin-bottom:20px;">まだありません。正解を重ねてマスターを目指しましょう！</p>';
+  if(weakCount === 0) weakHtml += '<p style="font-size:13px; color:var(--sub); margin-bottom:20px;">現在、苦手な植物はありません！</p>';
+  if(learningCount === 0) learningHtml += '<p style="font-size:13px; color:var(--sub); margin-bottom:20px;">現在学習中の植物はありません。</p>';
+
+  document.getElementById('record-master-area').innerHTML = masterHtml;
+  document.getElementById('record-weak-area').innerHTML = weakHtml;
+  document.getElementById('record-learning-area').innerHTML = learningHtml;
+  document.getElementById('record-unstudied-area').innerHTML = unstudiedHtml;
+}
+
+function showLevelup(lv) { const nextLv = LEVELS.find(l => l.id === lv.id + 1); document.getElementById('levelup-emoji').textContent = nextLv ? nextLv.icon : '🏆'; document.getElementById('levelup-title').textContent = nextLv ? `Lv.${nextLv.id} 解放！` : '全レベルコンプリート！'; document.getElementById('levelup-desc').textContent = nextLv ? `「${nextLv.name}」が解放されました！` : '全5レベルを制覇しました！おめでとう！'; document.getElementById('levelup-overlay').classList.add('show'); }
+function closeLevelup() { document.getElementById('levelup-overlay').classList.remove('show'); }
+function retrySession() { startLevel(currentLevel.id); }
+function goTop() { document.getElementById('screen-game').style.display = 'none'; document.getElementById('screen-result').style.display = 'none'; document.getElementById('screen-record').style.display = 'none'; renderTop(); }
+function showStreakPopup() { const msg = currentStreak >= 10 ? `🔥🔥🔥 ${currentStreak}連続！神ってる！` : currentStreak >= 7 ? `🔥🔥 ${currentStreak}連続！すごい！` : `🔥 ${currentStreak}連続！`; const el = document.getElementById('streak-popup'); el.textContent = msg; el.classList.add('show'); setTimeout(() => el.classList.remove('show'), 1800); }
+function saveGame() { localStorage.setItem('plant_game', JSON.stringify(gameState)); }
+document.addEventListener('keydown', e => { if (e.key === 'Enter' || e.key === ' ') { const nextBtn = document.getElementById('next-btn'); if (nextBtn.style.display !== 'none') nextQuestion(); e.preventDefault(); } });
+loadCSV();
+</script>
+</body>
+</html>
