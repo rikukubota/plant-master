@@ -176,7 +176,6 @@ header h1 { font-size: 15px; font-weight: 700; }
   </div>
 </div>
 
-<!-- トップ画面 -->
 <div id="screen-top">
   <div class="top-title">🌿 植物マスター</div>
   <div class="top-sub">garage green study app</div>
@@ -200,7 +199,6 @@ header h1 { font-size: 15px; font-weight: 700; }
   <div class="level-list" id="level-list"></div>
 </div>
 
-<!-- ゲーム画面 -->
 <div id="screen-game">
   <div class="game-header">
     <button class="back-btn" onclick="goTop()">←</button>
@@ -211,6 +209,9 @@ header h1 { font-size: 15px; font-weight: 700; }
   <div class="question-wrap">
     <div class="plant-photo" id="plant-photo"><div class="photo-placeholder">🌿</div></div>
     <div class="plant-name-hint" id="plant-name-hint" style="display:none"></div>
+    
+    <button id="search-hint-btn" style="width:100%; margin-bottom:14px; padding:10px; border-radius:12px; border:1px solid var(--green-m); background:var(--green-l); color:var(--green); font-size:13px; font-weight:700; cursor:pointer; display:flex; align-items:center; justify-content:center; gap:6px;">🔍 Google画像検索でいろんな写真を見る</button>
+    
     <div class="question-label">Q</div>
     <div class="question-text" id="question-text"></div>
     <div class="choices" id="choices"></div>
@@ -222,7 +223,6 @@ header h1 { font-size: 15px; font-weight: 700; }
   </div>
 </div>
 
-<!-- 結果画面 -->
 <div id="screen-result">
   <div class="result-emoji" id="result-emoji">🎉</div>
   <div class="result-title" id="result-title"></div>
@@ -232,7 +232,6 @@ header h1 { font-size: 15px; font-weight: 700; }
   <button class="result-btn secondary" onclick="goTop()">レベル選択に戻る</button>
 </div>
 
-<!-- 学習記録画面 -->
 <div id="screen-record">
   <div class="game-header">
     <button class="back-btn" onclick="goTop()">←</button>
@@ -265,7 +264,6 @@ if (!gameState.levelProgress) gameState.levelProgress = {};
 if (!gameState.streak) gameState.streak = 0;
 if (!gameState.bestStreak) gameState.bestStreak = 0;
 if (!gameState.totalCorrect) gameState.totalCorrect = 0;
-// 新機能：植物ごとの成績を保存するオブジェクトを追加
 if (!gameState.plantStats) gameState.plantStats = {};
 
 let currentLevel = null; let sessionPlants = []; let sessionIndex = 0; let sessionCorrect = 0; let currentStreak = 0; let answered = false;
@@ -309,7 +307,6 @@ function renderTop() {
   document.getElementById('screen-result').style.display = 'none';
   document.getElementById('screen-record').style.display = 'none';
 
-  // 「マスター種」の計算（2回以上正解＆正答率80%以上の植物数）
   let masteredPlantsCount = 0;
   Object.values(gameState.plantStats).forEach(stat => {
     if (stat.correct >= 2 && (stat.correct / (stat.correct + stat.wrong)) >= 0.8) masteredPlantsCount++;
@@ -356,9 +353,9 @@ function showQuestion() {
   document.getElementById('score-badge').textContent = `${sessionCorrect} / ${QUESTIONS_PER_SESSION}`;
   document.getElementById('game-progress-fill').style.width = `${sessionIndex / QUESTIONS_PER_SESSION * 100}%`;
   
-  // ▼ Macの濁点問題（ド・パなど）と スラッシュ（/）問題を両方自動解決する
+  // ▼ 画像表示：Macの濁点問題とスラッシュ問題を解決したバージョン
   const plantName = plant['植物名（流通名）'];
-  const safeName = plantName.replace(/\//g, '／'); // スラッシュ対策
+  const safeName = plantName.replace(/\//g, '／');
   const photoEl = document.getElementById('plant-photo');
   photoEl.innerHTML = ''; 
 
@@ -367,7 +364,6 @@ function showQuestion() {
   img.alt = plantName;
   img.style.cssText = 'width:100%;height:100%;object-fit:contain;padding:4px';
 
-  // 普通の名前で画像が出なかったら、Mac用の特殊な濁点（NFD）に変換して再トライする
   img.onerror = function() {
     if (!this.dataset.retried) {
       this.dataset.retried = 'true';
@@ -380,6 +376,12 @@ function showQuestion() {
 
   const hintEl = document.getElementById('plant-name-hint');
   if (lv.showName) { hintEl.style.display = 'block'; hintEl.textContent = `🌿 ${plant['植物名（流通名）']}`; } else { hintEl.style.display = 'none'; }
+  
+  // ▼ 新規追加：Google画像検索ボタンの動作設定
+  const searchBtn = document.getElementById('search-hint-btn');
+  searchBtn.onclick = function() {
+    window.open(`https://www.google.com/search?tbm=isch&q=${encodeURIComponent(plantName)}`, '_blank');
+  };
   
   document.getElementById('question-text').textContent = lv.question(plant);
   
@@ -406,7 +408,6 @@ function selectAnswer(selected, correct, qIndex) {
     else if (btnText === selected && !isCorrect) btn.classList.add('wrong');
   });
 
-  // 学習記録の保存処理（正解数・不正解数をカウントアップ）
   const pName = plant['植物名（流通名）'];
   if (!gameState.plantStats[pName]) gameState.plantStats[pName] = { correct: 0, wrong: 0 };
   if (isCorrect) {
@@ -445,7 +446,6 @@ function showResult() {
   document.getElementById('result-score-label').textContent = `正解率 ${pct}%`;
 }
 
-/* --- 新機能：学習記録画面の表示 --- */
 function showRecord() {
   document.getElementById('screen-top').style.display = 'none';
   document.getElementById('screen-record').style.display = 'block';
