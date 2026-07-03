@@ -360,7 +360,8 @@ function showQuestion() {
 
   const img = document.createElement('img');
   img.src = `images/${safeName}.jpg`;
-  img.alt = plantName;
+  // 💡 チート対策：ロード中のネタバレを防ぐため、altには答えを入れず共通のテキストに修正
+  img.alt = '植物の写真'; 
   img.style.cssText = 'width:100%;height:100%;object-fit:contain;padding:4px';
 
   img.onerror = function() {
