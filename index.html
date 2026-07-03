@@ -353,7 +353,6 @@ function showQuestion() {
   document.getElementById('score-badge').textContent = `${sessionCorrect} / ${QUESTIONS_PER_SESSION}`;
   document.getElementById('game-progress-fill').style.width = `${sessionIndex / QUESTIONS_PER_SESSION * 100}%`;
   
-  // ▼ 画像表示：Macの濁点問題とスラッシュ問題を解決したバージョン
   const plantName = plant['植物名（流通名）'];
   const safeName = plantName.replace(/\//g, '／');
   const photoEl = document.getElementById('plant-photo');
@@ -375,9 +374,8 @@ function showQuestion() {
   photoEl.appendChild(img);
 
   const hintEl = document.getElementById('plant-name-hint');
-  if (lv.showName) { hintEl.style.display = 'block'; hintEl.textContent = `🌿 ${plant['植物名（流通名）']}`; } else { hintEl.style.display = 'none'; }
+  if (lv.showName) { hintEl.style.display = 'block'; hintEl.textContent = `🌿 ${plantName}`; } else { hintEl.style.display = 'none'; }
   
-  // ▼ 新規追加：Google画像検索ボタンの動作設定
   const searchBtn = document.getElementById('search-hint-btn');
   searchBtn.onclick = function() {
     window.open(`https://www.google.com/search?tbm=isch&q=${encodeURIComponent(plantName)}`, '_blank');
@@ -423,7 +421,37 @@ function selectAnswer(selected, correct, qIndex) {
 
   const fb = document.getElementById('feedback'); fb.style.display = 'block'; fb.className = `feedback ${isCorrect ? 'correct' : 'wrong'}`;
   document.getElementById('feedback-title').textContent = isCorrect ? '✅ 正解！' : '❌ 不正解';
-  document.getElementById('feedback-desc').textContent = currentLevel.feedback(plant, isCorrect);
+  
+  let fbDesc = currentLevel.feedback(plant, isCorrect).replace(/\n/g, '<br>');
+  
+  if (currentLevel.id === 1) {
+    const wrongChoices = Array.from(document.querySelectorAll('.choice-btn'))
+      .map(b => b.textContent.replace(/^[A-D]\. /, '').trim())
+      .filter(text => text !== correct && text !== 'その他' && text !== 'わからない' && text !== '該当なし');
+      
+    if (wrongChoices.length > 0) {
+      fbDesc += `<div style="margin-top:14px; padding-top:12px; border-top:1px dashed var(--border);">`;
+      fbDesc += `<div style="font-size:12px; font-weight:bold; color:var(--text); margin-bottom:8px;">💡 他の選択肢の植物：</div>`;
+      fbDesc += `<div style="display:flex; gap:8px; justify-content:space-between;">`;
+      
+      wrongChoices.forEach(name => {
+        const safeName = name.replace(/\//g, '／');
+        fbDesc += `
+          <a href="https://www.google.com/search?tbm=isch&q=${encodeURIComponent(name)}" target="_blank" style="flex:1; text-align:center; min-width:0; text-decoration:none; display:block;" title="タップして高画質で検索">
+            <img src="images/${safeName}.jpg" 
+                 alt="${name}" 
+                 onerror="if(!this.dataset.retried){this.dataset.retried='true'; this.src='images/${safeName.normalize('NFD')}.jpg';}else{this.parentNode.innerHTML='<div style=\\'font-size:24px;background:var(--green-l);border-radius:8px;aspect-ratio:1;display:flex;align-items:center;justify-content:center;margin-bottom:4px;\\'>🌿</div><div style=\\'font-size:10px;line-height:1.2;word-break:break-all;color:var(--text);\\'>${name}</div>';}"
+                 style="width:100%; aspect-ratio:1; object-fit:cover; border-radius:8px; border:1px solid var(--green-m); margin-bottom:4px;">
+            <div style="font-size:10px; line-height:1.2; word-break:break-all; color:var(--text);">${name}</div>
+          </a>
+        `;
+      });
+      fbDesc += `</div></div>`;
+    }
+  }
+  
+  document.getElementById('feedback-desc').innerHTML = fbDesc;
+  
   document.getElementById('next-btn').style.display = 'block';
   saveGame();
 }
