@@ -360,7 +360,7 @@ function showQuestion() {
 
   const img = document.createElement('img');
   img.src = `images/${safeName}.jpg`;
-  // 💡 チート対策：ロード中のネタバレを防ぐため、altには答えを入れず共通のテキストに修正
+  // 💡 チート対策：alt・onerror内のどこにも植物名を出さない（ロード中/失敗時のネタバレ防止）
   img.alt = '植物の写真'; 
   img.style.cssText = 'width:100%;height:100%;object-fit:contain;padding:4px';
 
@@ -437,11 +437,14 @@ function selectAnswer(selected, correct, qIndex) {
       
       wrongChoices.forEach(name => {
         const safeName = name.replace(/\//g, '／');
+        // 💡 チート対策：alt・onerrorのフォールバック内のどこにも植物名を出さない
+        // （これは正解表示後のフィードバック内なので名前自体は隠す必要はないが、
+        //   統一のため画像読み込み失敗時は汎用アイコンのみ表示する）
         fbDesc += `
           <a href="https://www.google.com/search?tbm=isch&q=${encodeURIComponent(name)}" target="_blank" style="flex:1; text-align:center; min-width:0; text-decoration:none; display:block;" title="タップして高画質で検索">
             <img src="images/${safeName}.jpg" 
-                 alt="${name}" 
-                 onerror="if(!this.dataset.retried){this.dataset.retried='true'; this.src='images/${safeName.normalize('NFD')}.jpg';}else{this.parentNode.innerHTML='<div style=\\'font-size:24px;background:var(--green-l);border-radius:8px;aspect-ratio:1;display:flex;align-items:center;justify-content:center;margin-bottom:4px;\\'>🌿</div><div style=\\'font-size:10px;line-height:1.2;word-break:break-all;color:var(--text);\\'>${name}</div>';}"
+                 alt="植物の写真" 
+                 onerror="if(!this.dataset.retried){this.dataset.retried='true'; this.src='images/${safeName.normalize('NFD')}.jpg';}else{this.parentNode.innerHTML='<div style=\\'font-size:24px;background:var(--green-l);border-radius:8px;aspect-ratio:1;display:flex;align-items:center;justify-content:center;margin-bottom:4px;\\'>🌿</div>';}"
                  style="width:100%; aspect-ratio:1; object-fit:cover; border-radius:8px; border:1px solid var(--green-m); margin-bottom:4px;">
             <div style="font-size:10px; line-height:1.2; word-break:break-all; color:var(--text);">${name}</div>
           </a>
