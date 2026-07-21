@@ -146,6 +146,73 @@ header h1 { font-size: 15px; font-weight: 700; }
 .badge-master { background: var(--green-l); color: var(--green); padding: 3px 6px; border-radius: 4px; font-size: 11px; font-weight: 700; }
 .badge-learning { background: var(--amber-l); color: var(--amber); padding: 3px 6px; border-radius: 4px; font-size: 11px; font-weight: 700; }
 
+/* 図鑑マインドマップ画面 */
+#screen-atlas { display: none; padding: 0 0 30px; }
+.mindmap-toolbar { display: flex; gap: 8px; padding: 4px 16px 12px; }
+.mindmap-toolbar button {
+  flex: 1; padding: 9px; border-radius: 10px; border: 1.5px solid var(--border);
+  background: var(--surface); font-size: 12px; font-weight: 700; color: var(--text); cursor: pointer;
+}
+.mindmap-toolbar button:hover { border-color: var(--green-m); background: var(--green-l); color: var(--green); }
+#atlas-mindmap-wrap {
+  overflow: auto; -webkit-overflow-scrolling: touch; margin: 0 0 0 0;
+  background:
+    linear-gradient(var(--bg) 0 0),
+    repeating-linear-gradient(0deg, #00000008 0 1px, transparent 1px 24px),
+    repeating-linear-gradient(90deg, #00000008 0 1px, transparent 1px 24px);
+  height: calc(100vh - 210px); min-height: 320px; touch-action: pan-x pan-y;
+}
+#atlas-mindmap-canvas { position: relative; }
+.mm-svg { position: absolute; left: 0; top: 0; pointer-events: none; }
+.mm-svg path { fill: none; stroke: var(--green-m); stroke-width: 2; }
+.mm-node {
+  position: absolute; box-sizing: border-box; border-radius: 10px; cursor: pointer;
+  display: flex; align-items: center; gap: 6px; padding: 0 10px;
+  overflow: hidden; box-shadow: var(--shadow); border: 1.5px solid var(--border);
+  background: var(--surface); color: var(--text); line-height: 1.2; transition: border-color 0.15s;
+}
+.mm-node:active { border-color: var(--green); }
+.mm-arrow { font-size: 9px; flex-shrink: 0; color: var(--green); }
+.mm-label { font-size: 11.5px; font-weight: 700; flex: 1; display: -webkit-box; -webkit-line-clamp: 3; -webkit-box-orient: vertical; overflow: hidden; }
+.mm-count { font-size: 9px; color: var(--sub); flex-shrink: 0; }
+.mm-node.mm-d0 { background: var(--text); border-color: var(--text); }
+.mm-node.mm-d0 .mm-label { color: white; font-size: 13px; }
+.mm-node.mm-d1 { background: var(--green); border-color: var(--green); }
+.mm-node.mm-d1 .mm-label { color: white; font-size: 12.5px; font-weight: 800; }
+.mm-node.mm-d1 .mm-arrow, .mm-node.mm-d1 .mm-count { color: rgba(255,255,255,0.85); }
+.mm-node.mm-d2 { background: var(--green-l); border-color: var(--green-m); }
+.mm-node.mm-d3 { background: var(--surface); }
+.mm-node.mm-leaf { background: var(--amber-l); border-color: #e6c87a; }
+.mm-node.mm-leaf .mm-arrow { color: var(--amber); }
+
+.category-plants-title { font-size: 15px; font-weight: 800; margin: 26px 0 12px; padding-bottom: 6px; border-bottom: 2px solid var(--border); }
+.plant-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; }
+.plant-tile { background: var(--surface); border: 1.5px solid var(--border); border-radius: 12px; overflow: hidden; box-shadow: var(--shadow); }
+.plant-tile-photo { width: 100%; aspect-ratio: 1; background: var(--green-l); display: flex; align-items: center; justify-content: center; }
+.plant-tile-photo img { width: 100%; height: 100%; object-fit: cover; }
+.plant-tile-name { padding: 8px 6px; text-align: center; font-size: 11.5px; font-weight: 700; color: var(--sub); cursor: pointer; line-height: 1.3; min-height: 34px; display: flex; align-items: center; justify-content: center; }
+.plant-tile-name.revealed { color: var(--green); background: var(--green-l); }
+
+/* 個別植物カード（暗記フラッシュカード） */
+#screen-categorycard { display: none; padding: 0 0 30px; }
+.plantcard-wrap { padding: 16px 20px; }
+.plantcard-name { font-size: 20px; font-weight: 800; margin-bottom: 4px; }
+.plantcard-sub { font-size: 12.5px; color: var(--sub); margin-bottom: 16px; }
+.answer-card {
+  background: var(--surface); border: 1.5px solid var(--border); border-radius: 12px;
+  margin-bottom: 10px; overflow: hidden; box-shadow: var(--shadow);
+}
+.answer-card.revealed { border-color: var(--green-m); }
+.answer-header {
+  display: flex; align-items: center; justify-content: space-between;
+  padding: 14px 16px; cursor: pointer; font-size: 14px; font-weight: 700;
+}
+.answer-toggle { font-size: 11.5px; color: var(--sub); font-weight: 400; }
+.answer-body {
+  padding: 0 16px 16px; font-size: 13.5px; line-height: 1.7; color: var(--red);
+  font-weight: 700; border-top: 1px dashed var(--border); padding-top: 12px;
+}
+
 /* 演出用 */
 .streak-popup { position: fixed; top: 80px; left: 50%; transform: translateX(-50%) translateY(-20px); background: var(--gold); color: white; border-radius: 24px; padding: 8px 20px; font-size: 15px; font-weight: 800; opacity: 0; transition: all 0.3s; pointer-events: none; z-index: 999; }
 .streak-popup.show { opacity: 1; transform: translateX(-50%) translateY(0); }
@@ -196,6 +263,7 @@ header h1 { font-size: 15px; font-weight: 700; }
   </div>
 
   <button class="record-btn" onclick="showRecord()">📊 学習記録（植物図鑑）を見る</button>
+  <button class="record-btn" onclick="showAtlas()">🌳 植物図鑑ツリーを見る</button>
   <div class="level-list" id="level-list"></div>
 </div>
 
@@ -242,6 +310,34 @@ header h1 { font-size: 15px; font-weight: 700; }
     <div id="record-weak-area"></div>
     <div id="record-learning-area"></div>
     <div id="record-unstudied-area"></div>
+  </div>
+</div>
+
+<div id="screen-atlas">
+  <div class="game-header">
+    <button class="back-btn" onclick="goTop()">←</button>
+    <div class="game-title">🌳 植物図鑑マインドマップ</div>
+  </div>
+  <div class="mindmap-toolbar">
+    <button onclick="mmCollapseAll()">全部閉じる</button>
+    <button onclick="mmExpandLevel(2)">エリアまで展開</button>
+  </div>
+  <div id="atlas-mindmap-wrap">
+    <div id="atlas-mindmap-canvas">読み込み中...</div>
+  </div>
+</div>
+
+<div id="screen-categorycard">
+  <div class="game-header">
+    <button class="back-btn" onclick="goAtlasFromCard()">←</button>
+    <div class="game-title">分類カード</div>
+  </div>
+  <div class="plantcard-wrap">
+    <div class="plantcard-name" id="categorycard-name"></div>
+    <div class="plantcard-sub" id="categorycard-sub"></div>
+    <div id="categorycard-fields"></div>
+    <div class="category-plants-title">🌿 この分類の植物</div>
+    <div class="plant-grid" id="category-plant-grid"></div>
   </div>
 </div>
 
@@ -526,11 +622,242 @@ function showRecord() {
 function showLevelup(lv) { const nextLv = LEVELS.find(l => l.id === lv.id + 1); document.getElementById('levelup-emoji').textContent = nextLv ? nextLv.icon : '🏆'; document.getElementById('levelup-title').textContent = nextLv ? `Lv.${nextLv.id} 解放！` : '全レベルコンプリート！'; document.getElementById('levelup-desc').textContent = nextLv ? `「${nextLv.name}」が解放されました！` : '全5レベルを制覇しました！おめでとう！'; document.getElementById('levelup-overlay').classList.add('show'); }
 function closeLevelup() { document.getElementById('levelup-overlay').classList.remove('show'); }
 function retrySession() { startLevel(currentLevel.id); }
-function goTop() { document.getElementById('screen-game').style.display = 'none'; document.getElementById('screen-result').style.display = 'none'; document.getElementById('screen-record').style.display = 'none'; renderTop(); }
+function goTop() { document.getElementById('screen-game').style.display = 'none'; document.getElementById('screen-result').style.display = 'none'; document.getElementById('screen-record').style.display = 'none'; document.getElementById('screen-atlas').style.display = 'none'; document.getElementById('screen-categorycard').style.display = 'none'; renderTop(); }
 function showStreakPopup() { const msg = currentStreak >= 10 ? `🔥🔥🔥 ${currentStreak}連続！神ってる！` : currentStreak >= 7 ? `🔥🔥 ${currentStreak}連続！すごい！` : `🔥 ${currentStreak}連続！`; const el = document.getElementById('streak-popup'); el.textContent = msg; el.classList.add('show'); setTimeout(() => el.classList.remove('show'), 1800); }
 function saveGame() { localStorage.setItem('plant_game', JSON.stringify(gameState)); }
 document.addEventListener('keydown', e => { if (e.key === 'Enter' || e.key === ' ') { const nextBtn = document.getElementById('next-btn'); if (nextBtn.style.display !== 'none') nextQuestion(); e.preventDefault(); } });
+
+/* ===== 🌳 植物図鑑マインドマップ ===== */
+let atlasData = [];
+let mindRoot = null;
+let mindNodeSeq = 0;
+const mindNodeMap = {};
+
+const FIELD_DEFS = [
+  { key: 'habitat',  icon: '🌍', label: '自生地' },
+  { key: 'location', icon: '🏠', label: '屋外・屋内' },
+  { key: 'light',    icon: '☀️', label: '日照' },
+  { key: 'airflow',  icon: '💨', label: '風通し' },
+  { key: 'temp',     icon: '🌡️', label: '温度' },
+  { key: 'status',   icon: '🔄', label: '植物の状態' },
+  { key: 'watering', icon: '💧', label: '水やり' },
+];
+
+async function loadAtlas() {
+  try {
+    const res = await fetch('atlas.json');
+    atlasData = await res.json();
+    mindRoot = buildMindTree(atlasData);
+    renderMindmap();
+  } catch (e) {
+    console.error(e);
+    document.getElementById('atlas-mindmap-canvas').innerHTML = '<p style="color:var(--sub);font-size:13px;padding:16px;">atlas.jsonが読み込めませんでした。</p>';
+  }
+}
+
+function countPlants(catList) { return catList.reduce((s, c) => s + c.plants.length, 0); }
+
+function newMindNode(depth, label, count, opts) {
+  const node = Object.assign({ id: 'm' + (mindNodeSeq++), depth, label, count, expanded: false, children: [] }, opts || {});
+  mindNodeMap[node.id] = node;
+  return node;
+}
+
+function buildMindTree(data) {
+  const allTop = data.flatMap(ag => ag.areaCodes.flatMap(ac => ac.groups.flatMap(g => g.categories)));
+  const root = newMindNode(0, '🌿 植物図鑑', countPlants(allTop), { expanded: true });
+  data.forEach(ag => {
+    const agCats = ag.areaCodes.flatMap(ac => ac.groups.flatMap(g => g.categories));
+    const agNode = newMindNode(1, ag.areaGroup, countPlants(agCats));
+    ag.areaCodes.forEach(ac => {
+      const acCats = ac.groups.flatMap(g => g.categories);
+      const acNode = newMindNode(2, `${ac.areaCode}　${ac.title}`, countPlants(acCats));
+      ac.groups.forEach(g => {
+        const gNode = newMindNode(3, g.groupName, countPlants(g.categories));
+        g.categories.forEach(c => {
+          const cNode = newMindNode(4, c.name, c.plants.length, { isLeaf: true, code: c.code, children: null });
+          gNode.children.push(cNode);
+        });
+        acNode.children.push(gNode);
+      });
+      agNode.children.push(acNode);
+    });
+    root.children.push(agNode);
+  });
+  return root;
+}
+
+const MM_COL_WIDTH = 186;
+const MM_NODE_WIDTH = 168;
+const MM_ROW_HEIGHT = 52;
+const MM_NODE_HEIGHT = 44;
+
+function mmLayout(node, depth, cursor) {
+  node.depth = depth;
+  node.x = depth * MM_COL_WIDTH + 16;
+  if (cursor.maxDepth < depth) cursor.maxDepth = depth;
+  if (!node.expanded || !node.children || node.children.length === 0) {
+    node.y = cursor.y + MM_ROW_HEIGHT / 2;
+    cursor.y += MM_ROW_HEIGHT;
+  } else {
+    node.children.forEach(child => mmLayout(child, depth + 1, cursor));
+    const first = node.children[0].y;
+    const last = node.children[node.children.length - 1].y;
+    node.y = (first + last) / 2;
+  }
+}
+
+function mmCollectVisible(node, list) {
+  list.push(node);
+  if (node.expanded && node.children) node.children.forEach(c => mmCollectVisible(c, list));
+}
+
+function renderMindmap() {
+  if (!mindRoot) return;
+  const cursor = { y: 16, maxDepth: 0 };
+  mmLayout(mindRoot, 0, cursor);
+  const totalHeight = Math.max(cursor.y + 16, 200);
+  const totalWidth = (cursor.maxDepth + 1) * MM_COL_WIDTH + MM_NODE_WIDTH + 32;
+
+  const visible = [];
+  mmCollectVisible(mindRoot, visible);
+
+  let paths = '';
+  visible.forEach(node => {
+    if (node.expanded && node.children) {
+      node.children.forEach(child => {
+        const px = node.x + MM_NODE_WIDTH, py = node.y;
+        const cx = child.x, cy = child.y;
+        const mx = (px + cx) / 2;
+        paths += `<path d="M${px},${py} C${mx},${py} ${mx},${cy} ${cx},${cy}"/>`;
+      });
+    }
+  });
+
+  let nodesHtml = '';
+  visible.forEach(node => {
+    const depthClass = node.depth === 0 ? 'mm-d0' : node.depth === 1 ? 'mm-d1' : node.depth === 2 ? 'mm-d2' : 'mm-d3';
+    const leafClass = node.isLeaf ? ' mm-leaf' : '';
+    const hasChildren = node.children && node.children.length > 0;
+    const arrow = node.isLeaf ? '🌿' : (hasChildren ? (node.expanded ? '▼' : '▶') : '・');
+    const onclick = node.isLeaf ? `openCategoryCard('${node.code}')` : (hasChildren ? `mmToggle('${node.id}')` : '');
+    const h = node.depth === 0 ? 40 : MM_NODE_HEIGHT;
+    nodesHtml += `
+      <div class="mm-node ${depthClass}${leafClass}" style="left:${node.x}px; top:${node.y - h / 2}px; width:${MM_NODE_WIDTH}px; height:${h}px;" onclick="${onclick}">
+        <span class="mm-arrow">${arrow}</span>
+        <span class="mm-label">${node.label}</span>
+        <span class="mm-count">${node.count}</span>
+      </div>`;
+  });
+
+  const canvas = document.getElementById('atlas-mindmap-canvas');
+  canvas.style.width = totalWidth + 'px';
+  canvas.style.height = totalHeight + 'px';
+  canvas.innerHTML = `<svg class="mm-svg" width="${totalWidth}" height="${totalHeight}">${paths}</svg>${nodesHtml}`;
+}
+
+function mmToggle(id) {
+  const node = mindNodeMap[id];
+  if (!node) return;
+  node.expanded = !node.expanded;
+  renderMindmap();
+}
+
+function mmCollapseAll() {
+  Object.values(mindNodeMap).forEach(n => { if (n.depth > 0) n.expanded = false; });
+  renderMindmap();
+}
+
+function mmExpandLevel(depth) {
+  Object.values(mindNodeMap).forEach(n => { if (n.depth < depth) n.expanded = true; });
+  renderMindmap();
+}
+
+function showAtlas() {
+  document.getElementById('screen-top').style.display = 'none';
+  document.getElementById('screen-atlas').style.display = 'block';
+  if (atlasData.length === 0) loadAtlas();
+}
+
+function findCategoryByCode(code) {
+  for (const ag of atlasData) for (const ac of ag.areaCodes) for (const g of ac.groups) for (const c of g.categories) if (c.code === code) return c;
+  return null;
+}
+
+function findCategoryContext(code) {
+  for (const ag of atlasData) for (const ac of ag.areaCodes) for (const g of ac.groups) for (const c of g.categories)
+    if (c.code === code) return { areaGroup: ag.areaGroup, areaCodeTitle: ac.title, groupName: g.groupName, cat: c };
+  return null;
+}
+
+let categoryCardPlants = [];
+
+function openCategoryCard(catCode) {
+  const ctx = findCategoryContext(catCode);
+  if (!ctx) return;
+  const cat = ctx.cat;
+  categoryCardPlants = cat.plants;
+
+  document.getElementById('screen-atlas').style.display = 'none';
+  document.getElementById('screen-categorycard').style.display = 'block';
+  document.getElementById('categorycard-name').textContent = cat.name;
+  document.getElementById('categorycard-sub').textContent = `${ctx.groupName} ・ ${ctx.areaCodeTitle}`;
+
+  document.getElementById('categorycard-fields').innerHTML = FIELD_DEFS.map((f, i) => `
+    <div class="answer-card" id="ans-${i}">
+      <div class="answer-header" onclick="toggleAnswer(${i})">
+        <span>${f.icon} ${f.label}</span>
+        <span class="answer-toggle" id="ans-${i}-toggle">タップして表示</span>
+      </div>
+      <div class="answer-body" id="ans-${i}-body" style="display:none">${escapeAnswerText(cat[f.key])}</div>
+    </div>
+  `).join('');
+
+  document.getElementById('category-plant-grid').innerHTML = cat.plants.map((p, i) => {
+    const safeName = p.name.replace(/\//g, '／');
+    return `
+      <div class="plant-tile">
+        <div class="plant-tile-photo">
+          <img src="images/${safeName}.jpg" alt="植物の写真" loading="lazy"
+               onerror="if(!this.dataset.retried){this.dataset.retried='true'; this.src='images/${safeName.normalize('NFD')}.jpg';}else{this.parentNode.innerHTML='<div style=\\'font-size:26px;\\'>🌿</div>';}"
+               style="width:100%;height:100%;object-fit:cover;">
+        </div>
+        <div class="plant-tile-name" id="pt-${i}-name" onclick="togglePlantName(${i})">タップして名前を表示</div>
+      </div>`;
+  }).join('');
+}
+
+function togglePlantName(i) {
+  const el = document.getElementById(`pt-${i}-name`);
+  const isRevealed = el.classList.contains('revealed');
+  if (isRevealed) {
+    el.textContent = 'タップして名前を表示';
+    el.classList.remove('revealed');
+  } else {
+    el.textContent = `${categoryCardPlants[i].no} ${categoryCardPlants[i].name}`;
+    el.classList.add('revealed');
+  }
+}
+
+function escapeAnswerText(str) { return (str || '—').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/\n/g, '<br>'); }
+
+function toggleAnswer(i) {
+  const body = document.getElementById(`ans-${i}-body`);
+  const toggle = document.getElementById(`ans-${i}-toggle`);
+  const card = document.getElementById(`ans-${i}`);
+  const isOpen = body.style.display !== 'none';
+  body.style.display = isOpen ? 'none' : 'block';
+  toggle.textContent = isOpen ? 'タップして表示' : '';
+  card.classList.toggle('revealed', !isOpen);
+}
+
+function goAtlasFromCard() {
+  document.getElementById('screen-categorycard').style.display = 'none';
+  document.getElementById('screen-atlas').style.display = 'block';
+}
+
 loadCSV();
+loadAtlas();
 </script>
 </body>
 </html>
