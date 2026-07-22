@@ -235,7 +235,7 @@ header h1 { font-size: 15px; font-weight: 700; }
 .region-panel-item-count { font-size: 11px; color: var(--sub); flex-shrink: 0; margin-left: 8px; }
 
 /* 名前当てクイズ */
-#screen-nq-cats, #screen-nq-play, #screen-nq-result { display: none; padding: 0 0 30px; }
+#screen-nq-cats, #screen-nq-play, #screen-nq-result, #screen-nq-weak { display: none; padding: 0 0 30px; }
 .nq-cat-list { padding: 4px 16px; display: flex; flex-direction: column; gap: 10px; }
 .nq-cat-card {
   display: flex; align-items: center; justify-content: space-between; cursor: pointer;
@@ -442,7 +442,21 @@ header h1 { font-size: 15px; font-weight: 700; }
     <div class="game-title">⌨️ 名前当てクイズ</div>
   </div>
   <p class="globe-hint">30種ずつのカテゴリで集中的に覚えよう。写真を見て植物名を入力してね。</p>
+  <div class="mindmap-toolbar">
+    <button onclick="showNQWeakList()">🔴 苦手な植物だけ見る</button>
+  </div>
   <div class="nq-cat-list" id="nq-cat-list"></div>
+</div>
+
+<div id="screen-nq-weak">
+  <div class="game-header">
+    <button class="back-btn" onclick="showNameQuizCategories()">←</button>
+    <div class="game-title">🔴 苦手な植物一覧</div>
+  </div>
+  <div class="plantcard-wrap">
+    <div id="nq-weak-empty" style="display:none; text-align:center; color:var(--sub); font-size:13px; padding:30px 10px;">まだ苦手な植物はありません。クイズをやってみよう！</div>
+    <div class="plant-grid" id="nq-weak-list"></div>
+  </div>
 </div>
 
 <div id="screen-nq-play">
@@ -754,7 +768,7 @@ function showRecord() {
 function showLevelup(lv) { const nextLv = LEVELS.find(l => l.id === lv.id + 1); document.getElementById('levelup-emoji').textContent = nextLv ? nextLv.icon : '🏆'; document.getElementById('levelup-title').textContent = nextLv ? `Lv.${nextLv.id} 解放！` : '全レベルコンプリート！'; document.getElementById('levelup-desc').textContent = nextLv ? `「${nextLv.name}」が解放されました！` : '全5レベルを制覇しました！おめでとう！'; document.getElementById('levelup-overlay').classList.add('show'); }
 function closeLevelup() { document.getElementById('levelup-overlay').classList.remove('show'); }
 function retrySession() { startLevel(currentLevel.id); }
-function goTop() { document.getElementById('screen-game').style.display = 'none'; document.getElementById('screen-result').style.display = 'none'; document.getElementById('screen-record').style.display = 'none'; document.getElementById('screen-atlas').style.display = 'none'; document.getElementById('screen-categorycard').style.display = 'none'; document.getElementById('screen-globe').style.display = 'none'; document.getElementById('region-panel-overlay').classList.remove('show'); document.getElementById('screen-nq-cats').style.display = 'none'; document.getElementById('screen-nq-play').style.display = 'none'; document.getElementById('screen-nq-result').style.display = 'none'; renderTop(); }
+function goTop() { document.getElementById('screen-game').style.display = 'none'; document.getElementById('screen-result').style.display = 'none'; document.getElementById('screen-record').style.display = 'none'; document.getElementById('screen-atlas').style.display = 'none'; document.getElementById('screen-categorycard').style.display = 'none'; document.getElementById('screen-globe').style.display = 'none'; document.getElementById('region-panel-overlay').classList.remove('show'); document.getElementById('screen-nq-cats').style.display = 'none'; document.getElementById('screen-nq-play').style.display = 'none'; document.getElementById('screen-nq-result').style.display = 'none'; document.getElementById('screen-nq-weak').style.display = 'none'; renderTop(); }
 function showStreakPopup() { const msg = currentStreak >= 10 ? `🔥🔥🔥 ${currentStreak}連続！神ってる！` : currentStreak >= 7 ? `🔥🔥 ${currentStreak}連続！すごい！` : `🔥 ${currentStreak}連続！`; const el = document.getElementById('streak-popup'); el.textContent = msg; el.classList.add('show'); setTimeout(() => el.classList.remove('show'), 1800); }
 function saveGame() { localStorage.setItem('plant_game', JSON.stringify(gameState)); }
 document.addEventListener('keydown', e => { if (e.key === 'Enter' || e.key === ' ') { const nextBtn = document.getElementById('next-btn'); if (nextBtn.style.display !== 'none') nextQuestion(); e.preventDefault(); } });
@@ -1165,9 +1179,33 @@ function showNameQuizCategories() {
   document.getElementById('screen-top').style.display = 'none';
   document.getElementById('screen-nq-play').style.display = 'none';
   document.getElementById('screen-nq-result').style.display = 'none';
+  document.getElementById('screen-nq-weak').style.display = 'none';
   document.getElementById('screen-nq-cats').style.display = 'block';
   if (nqAllPlants.length === 0) { loadNameQuiz().then(renderNQCategories); }
   else renderNQCategories();
+}
+
+function showNQWeakList() {
+  document.getElementById('screen-nq-cats').style.display = 'none';
+  document.getElementById('screen-nq-weak').style.display = 'block';
+  const weak = nqAllPlants
+    .filter(p => nqIsWeak(p.no))
+    .map(p => Object.assign({}, p, { wrongCount: nqStats[p.no].wrong }))
+    .sort((a, b) => b.wrongCount - a.wrongCount);
+
+  document.getElementById('nq-weak-empty').style.display = weak.length === 0 ? 'block' : 'none';
+  document.getElementById('nq-weak-list').innerHTML = weak.map(p => {
+    const safeName = p.name.replace(/\//g, '／');
+    return `
+      <div class="plant-tile">
+        <div class="plant-tile-photo">
+          <img src="images/${safeName}.jpg" alt="植物の写真" loading="lazy"
+               onerror="if(!this.dataset.retried){this.dataset.retried='true'; this.src='images/${safeName.normalize('NFD')}.jpg';}else{this.parentNode.innerHTML='<div style=\\'font-size:26px;\\'>🌿</div>';}"
+               style="width:100%;height:100%;object-fit:cover;">
+        </div>
+        <div class="plant-tile-name revealed">${p.no} ${p.name}<br><span style="font-weight:400;">❌ ${p.wrongCount}回</span></div>
+      </div>`;
+  }).join('');
 }
 
 function renderNQCategories() {
