@@ -202,6 +202,74 @@ header h1 { font-size: 15px; font-weight: 700; }
   background: var(--surface); border: 1.5px solid var(--border); border-radius: 12px;
   margin-bottom: 10px; overflow: hidden; box-shadow: var(--shadow);
 }
+
+/* 地球マップ */
+#screen-globe { display: none; padding: 0 0 20px; }
+.globe-legend { display: flex; flex-wrap: wrap; gap: 6px; padding: 2px 16px 12px; }
+.globe-legend-item { display: flex; align-items: center; gap: 4px; font-size: 10.5px; font-weight: 700; color: var(--sub); background: var(--surface); border: 1px solid var(--border); border-radius: 20px; padding: 4px 9px; }
+.globe-legend-dot { width: 9px; height: 9px; border-radius: 50%; flex-shrink: 0; }
+#globe-map-wrap {
+  overflow: auto; -webkit-overflow-scrolling: touch; margin: 0 16px; border-radius: 14px;
+  border: 1.5px solid var(--border); height: calc(100vh - 300px); min-height: 300px; touch-action: pan-x pan-y;
+}
+#globe-map-canvas { position: relative; }
+.globe-hint { font-size: 11px; color: var(--sub); text-align: center; padding: 10px 20px 0; }
+.gm-band-label { font-size: 9px; fill: var(--sub); }
+.gm-continent { fill: #6b8f5c; fill-opacity: 0.13; stroke: #6b8f5c; stroke-opacity: 0.35; stroke-width: 1; stroke-dasharray: 3 3; }
+.gm-continent-label { font-size: 10px; fill: var(--green); fill-opacity: 0.65; font-weight: 700; }
+.gm-line { stroke: #ffffff; stroke-opacity: 0.6; stroke-width: 1; stroke-dasharray: 2 3; }
+.gm-marker { cursor: pointer; stroke: white; stroke-width: 1.5; }
+.gm-marker-count { font-size: 9px; fill: white; font-weight: 800; text-anchor: middle; pointer-events: none; }
+
+.region-panel-overlay { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.5); z-index: 500; align-items: flex-end; justify-content: center; }
+.region-panel-overlay.show { display: flex; }
+.region-panel { background: var(--bg); width: 100%; max-width: 480px; max-height: 72vh; border-radius: 20px 20px 0 0; box-shadow: 0 -6px 24px rgba(0,0,0,0.2); display: flex; flex-direction: column; }
+.region-panel-header { display: flex; align-items: flex-start; justify-content: space-between; padding: 18px 18px 12px; border-bottom: 1px solid var(--border); }
+.region-panel-title { font-size: 16px; font-weight: 800; }
+.region-panel-sub { font-size: 11.5px; color: var(--sub); margin-top: 2px; }
+.region-panel-close { border: none; background: var(--surface); width: 30px; height: 30px; border-radius: 50%; font-size: 13px; color: var(--sub); cursor: pointer; flex-shrink: 0; }
+.region-panel-list { overflow-y: auto; padding: 12px 18px 24px; }
+.region-panel-item { display: flex; justify-content: space-between; align-items: center; background: var(--surface); border: 1.5px solid var(--border); border-radius: 12px; padding: 12px 14px; margin-bottom: 8px; cursor: pointer; }
+.region-panel-item:hover { border-color: var(--green-m); }
+.region-panel-item-name { font-size: 13px; font-weight: 700; }
+.region-panel-item-count { font-size: 11px; color: var(--sub); flex-shrink: 0; margin-left: 8px; }
+
+/* 名前当てクイズ */
+#screen-nq-cats, #screen-nq-play, #screen-nq-result { display: none; padding: 0 0 30px; }
+.nq-cat-list { padding: 4px 16px; display: flex; flex-direction: column; gap: 10px; }
+.nq-cat-card {
+  display: flex; align-items: center; justify-content: space-between; cursor: pointer;
+  background: var(--surface); border: 1.5px solid var(--border); border-radius: 14px;
+  padding: 15px 16px; box-shadow: var(--shadow);
+}
+.nq-cat-card:hover { border-color: var(--green-m); }
+.nq-cat-card-label { font-size: 14.5px; font-weight: 800; }
+.nq-cat-card-sub { font-size: 11.5px; color: var(--sub); margin-top: 2px; }
+.nq-cat-card-weak { font-size: 10.5px; font-weight: 800; color: #d64545; background: #fbe4e4; border-radius: 20px; padding: 3px 9px; flex-shrink: 0; }
+.nq-progress { padding: 4px 20px 10px; font-size: 12.5px; color: var(--sub); font-weight: 700; }
+.nq-input {
+  width: 100%; box-sizing: border-box; font-size: 17px; font-weight: 700; text-align: center;
+  padding: 14px; border-radius: 12px; border: 2px solid var(--border); background: var(--surface);
+  color: var(--text); margin-bottom: 10px;
+}
+.nq-input:focus { outline: none; border-color: var(--green); }
+.nq-input.correct { border-color: var(--green); background: var(--green-l); }
+.nq-input.wrong { border-color: #d64545; background: #fbe4e4; }
+.nq-feedback { min-height: 24px; text-align: center; font-size: 13.5px; font-weight: 700; margin-bottom: 8px; }
+.nq-feedback.correct { color: var(--green); }
+.nq-feedback.wrong { color: #d64545; }
+.nq-action-btn {
+  width: 100%; padding: 15px; border-radius: 12px; border: none; background: var(--green);
+  color: white; font-size: 15px; font-weight: 800; cursor: pointer;
+}
+.nq-skip { text-align: center; font-size: 12px; color: var(--sub); margin-top: 12px; cursor: pointer; text-decoration: underline; }
+.nq-score { font-size: 26px; font-weight: 800; text-align: center; margin: 10px 0 20px; }
+#nq-result-actions { display: flex; flex-direction: column; gap: 10px; margin-bottom: 8px; }
+#nq-result-actions button {
+  width: 100%; padding: 14px; border-radius: 12px; border: 1.5px solid var(--border);
+  background: var(--surface); font-size: 14px; font-weight: 800; cursor: pointer;
+}
+#nq-result-actions button.primary { background: var(--green); border-color: var(--green); color: white; }
 .answer-card.revealed { border-color: var(--green-m); }
 .answer-header {
   display: flex; align-items: center; justify-content: space-between;
@@ -263,7 +331,9 @@ header h1 { font-size: 15px; font-weight: 700; }
   </div>
 
   <button class="record-btn" onclick="showRecord()">📊 学習記録（植物図鑑）を見る</button>
-  <button class="record-btn" onclick="showAtlas()">🌳 植物図鑑ツリーを見る</button>
+  <button class="record-btn" onclick="showAtlas()">🌳 植物図鑑マインドマップを見る</button>
+  <button class="record-btn" onclick="showGlobe()">🌍 地球マップで覚える</button>
+  <button class="record-btn" onclick="showNameQuizCategories()">⌨️ 名前当てクイズ（入力式）</button>
   <div class="level-list" id="level-list"></div>
 </div>
 
@@ -338,6 +408,68 @@ header h1 { font-size: 15px; font-weight: 700; }
     <div id="categorycard-fields"></div>
     <div class="category-plants-title">🌿 この分類の植物</div>
     <div class="plant-grid" id="category-plant-grid"></div>
+  </div>
+</div>
+
+<div id="screen-globe">
+  <div class="game-header">
+    <button class="back-btn" onclick="goTop()">←</button>
+    <div class="game-title">🌍 地球マップで覚える</div>
+  </div>
+  <div class="globe-legend" id="globe-legend"></div>
+  <div id="globe-map-wrap">
+    <div id="globe-map-canvas">読み込み中...</div>
+  </div>
+  <p class="globe-hint">丸をタップすると、その地域の分類が見られます（気候・地域はおおよその目安です）</p>
+</div>
+
+<div class="region-panel-overlay" id="region-panel-overlay">
+  <div class="region-panel">
+    <div class="region-panel-header">
+      <div>
+        <div class="region-panel-title" id="region-panel-title"></div>
+        <div class="region-panel-sub" id="region-panel-sub"></div>
+      </div>
+      <button class="region-panel-close" onclick="closeRegionPanel()">✕</button>
+    </div>
+    <div class="region-panel-list" id="region-panel-list"></div>
+  </div>
+</div>
+
+<div id="screen-nq-cats">
+  <div class="game-header">
+    <button class="back-btn" onclick="goTop()">←</button>
+    <div class="game-title">⌨️ 名前当てクイズ</div>
+  </div>
+  <p class="globe-hint">30種ずつのカテゴリで集中的に覚えよう。写真を見て植物名を入力してね。</p>
+  <div class="nq-cat-list" id="nq-cat-list"></div>
+</div>
+
+<div id="screen-nq-play">
+  <div class="game-header">
+    <button class="back-btn" onclick="showNameQuizCategories()">←</button>
+    <div class="game-title" id="nq-play-title">名前当てクイズ</div>
+  </div>
+  <div class="nq-progress" id="nq-progress"></div>
+  <div class="plantcard-wrap">
+    <div class="plant-photo" id="nq-photo"><div class="photo-placeholder">🌿</div></div>
+    <input type="text" id="nq-input" class="nq-input" placeholder="植物の名前を入力" autocomplete="off" autocapitalize="off" autocorrect="off" spellcheck="false">
+    <div class="nq-feedback" id="nq-feedback"></div>
+    <button class="nq-action-btn" id="nq-action-btn">こたえる</button>
+    <div class="nq-skip" id="nq-skip" onclick="nqReveal()">わからない（答えを見る）</div>
+  </div>
+</div>
+
+<div id="screen-nq-result">
+  <div class="game-header">
+    <button class="back-btn" onclick="showNameQuizCategories()">←</button>
+    <div class="game-title">結果</div>
+  </div>
+  <div class="plantcard-wrap">
+    <div class="nq-score" id="nq-score"></div>
+    <div id="nq-result-actions"></div>
+    <div class="category-plants-title" id="nq-wronglist-title" style="display:none;">🔴 間違えた植物</div>
+    <div class="plant-grid" id="nq-wronglist"></div>
   </div>
 </div>
 
@@ -622,7 +754,7 @@ function showRecord() {
 function showLevelup(lv) { const nextLv = LEVELS.find(l => l.id === lv.id + 1); document.getElementById('levelup-emoji').textContent = nextLv ? nextLv.icon : '🏆'; document.getElementById('levelup-title').textContent = nextLv ? `Lv.${nextLv.id} 解放！` : '全レベルコンプリート！'; document.getElementById('levelup-desc').textContent = nextLv ? `「${nextLv.name}」が解放されました！` : '全5レベルを制覇しました！おめでとう！'; document.getElementById('levelup-overlay').classList.add('show'); }
 function closeLevelup() { document.getElementById('levelup-overlay').classList.remove('show'); }
 function retrySession() { startLevel(currentLevel.id); }
-function goTop() { document.getElementById('screen-game').style.display = 'none'; document.getElementById('screen-result').style.display = 'none'; document.getElementById('screen-record').style.display = 'none'; document.getElementById('screen-atlas').style.display = 'none'; document.getElementById('screen-categorycard').style.display = 'none'; renderTop(); }
+function goTop() { document.getElementById('screen-game').style.display = 'none'; document.getElementById('screen-result').style.display = 'none'; document.getElementById('screen-record').style.display = 'none'; document.getElementById('screen-atlas').style.display = 'none'; document.getElementById('screen-categorycard').style.display = 'none'; document.getElementById('screen-globe').style.display = 'none'; document.getElementById('region-panel-overlay').classList.remove('show'); document.getElementById('screen-nq-cats').style.display = 'none'; document.getElementById('screen-nq-play').style.display = 'none'; document.getElementById('screen-nq-result').style.display = 'none'; renderTop(); }
 function showStreakPopup() { const msg = currentStreak >= 10 ? `🔥🔥🔥 ${currentStreak}連続！神ってる！` : currentStreak >= 7 ? `🔥🔥 ${currentStreak}連続！すごい！` : `🔥 ${currentStreak}連続！`; const el = document.getElementById('streak-popup'); el.textContent = msg; el.classList.add('show'); setTimeout(() => el.classList.remove('show'), 1800); }
 function saveGame() { localStorage.setItem('plant_game', JSON.stringify(gameState)); }
 document.addEventListener('keydown', e => { if (e.key === 'Enter' || e.key === ' ') { const nextBtn = document.getElementById('next-btn'); if (nextBtn.style.display !== 'none') nextQuestion(); e.preventDefault(); } });
@@ -792,13 +924,17 @@ function findCategoryContext(code) {
 
 let categoryCardPlants = [];
 
+let categoryCardOrigin = 'atlas';
+
 function openCategoryCard(catCode) {
   const ctx = findCategoryContext(catCode);
   if (!ctx) return;
   const cat = ctx.cat;
   categoryCardPlants = cat.plants;
 
+  categoryCardOrigin = document.getElementById('screen-globe').style.display === 'block' ? 'globe' : 'atlas';
   document.getElementById('screen-atlas').style.display = 'none';
+  document.getElementById('screen-globe').style.display = 'none';
   document.getElementById('screen-categorycard').style.display = 'block';
   document.getElementById('categorycard-name').textContent = cat.name;
   document.getElementById('categorycard-sub').textContent = `${ctx.groupName} ・ ${ctx.areaCodeTitle}`;
@@ -853,11 +989,351 @@ function toggleAnswer(i) {
 
 function goAtlasFromCard() {
   document.getElementById('screen-categorycard').style.display = 'none';
-  document.getElementById('screen-atlas').style.display = 'block';
+  document.getElementById(categoryCardOrigin === 'globe' ? 'screen-globe' : 'screen-atlas').style.display = 'block';
 }
+
+/* ===== 🌍 地球マップ ===== */
+let globeData = [];
+const GM_W = 720, GM_H = 360;
+const CLIMATE_DEFS = {
+  desert:       { label: '乾燥・砂漠',   emoji: '🏜️', color: '#c99a4b' },
+  mediterranean:{ label: '地中海性気候', emoji: '🫒', color: '#8a9a5b' },
+  tropical:     { label: '熱帯',         emoji: '🌴', color: '#2f9e5c' },
+  subtropical:  { label: '亜熱帯',       emoji: '🌿', color: '#4fae70' },
+  temperate:    { label: '温帯',         emoji: '🍃', color: '#5b9bd5' },
+  cold:         { label: '高山・寒冷',   emoji: '❄️', color: '#7a8fa6' },
+  wetland:      { label: '湿地・水辺',   emoji: '💧', color: '#4aa3c9' },
+};
+const GM_CONTINENTS = [
+  { label: '北アメリカ', latMin: 15, latMax: 72, lngMin: -170, lngMax: -52 },
+  { label: '南アメリカ', latMin: -56, latMax: 13, lngMin: -82, lngMax: -34 },
+  { label: 'ヨーロッパ', latMin: 36, latMax: 71, lngMin: -11, lngMax: 40 },
+  { label: 'アフリカ',   latMin: -35, latMax: 37, lngMin: -18, lngMax: 52 },
+  { label: 'アジア',     latMin: 5, latMax: 77, lngMin: 40, lngMax: 150 },
+  { label: 'オセアニア', latMin: -47, latMax: -9, lngMin: 110, lngMax: 179 },
+];
+
+function gmXY(lat, lng) { return [(lng + 180) / 360 * GM_W, (90 - lat) / 180 * GM_H]; }
+
+async function loadGlobe() {
+  try {
+    const res = await fetch('globe.json');
+    globeData = await res.json();
+    renderGlobeMap();
+  } catch (e) {
+    console.error(e);
+    document.getElementById('globe-map-canvas').innerHTML = '<p style="color:var(--sub);font-size:13px;padding:16px;">globe.jsonが読み込めませんでした。</p>';
+  }
+}
+
+function buildRegionClusters() {
+  const map = {};
+  globeData.forEach(c => {
+    const key = c.region + '|' + c.lat + '|' + c.lng;
+    if (!map[key]) map[key] = { region: c.region, lat: c.lat, lng: c.lng, cats: [], climateCounts: {} };
+    map[key].cats.push(c);
+    map[key].climateCounts[c.climate] = (map[key].climateCounts[c.climate] || 0) + 1;
+  });
+  return Object.values(map).map(cluster => {
+    let topClimate = 'tropical', topN = -1;
+    Object.entries(cluster.climateCounts).forEach(([k, n]) => { if (n > topN) { topN = n; topClimate = k; } });
+    cluster.climate = topClimate;
+    cluster.plantCount = cluster.cats.reduce((s, c) => s + c.count, 0);
+    return cluster;
+  });
+}
+
+function renderGlobeMap() {
+  const clusters = buildRegionClusters();
+
+  // 気候帯の緯度バンド
+  const bandStops = [90, 55, 35, 23.5, -23.5, -35, -55, -90];
+  const bandColors = ['#7a8fa622', '#5b9bd522', '#4fae7022', '#2f9e5c22', '#4fae7022', '#5b9bd522', '#7a8fa622'];
+  let bands = '';
+  for (let i = 0; i < bandStops.length - 1; i++) {
+    const [, y1] = gmXY(bandStops[i], 0);
+    const [, y2] = gmXY(bandStops[i + 1], 0);
+    bands += `<rect x="0" y="${y1}" width="${GM_W}" height="${y2 - y1}" fill="${bandColors[i]}"/>`;
+  }
+  const [, yEq] = gmXY(0, 0);
+  const [, yTn] = gmXY(23.5, 0);
+  const [, yTs] = gmXY(-23.5, 0);
+  let lines = `<line class="gm-line" x1="0" y1="${yEq}" x2="${GM_W}" y2="${yEq}"/>
+    <line class="gm-line" x1="0" y1="${yTn}" x2="${GM_W}" y2="${yTn}"/>
+    <line class="gm-line" x1="0" y1="${yTs}" x2="${GM_W}" y2="${yTs}"/>`;
+  let bandLabels = `<text class="gm-band-label" x="4" y="${yEq - 4}">赤道</text>
+    <text class="gm-band-label" x="4" y="${yTn - 4}">北回帰線</text>
+    <text class="gm-band-label" x="4" y="${yTs + 12}">南回帰線</text>`;
+
+  let continents = '';
+  GM_CONTINENTS.forEach(cont => {
+    const [x1, y1] = gmXY(cont.latMax, cont.lngMin);
+    const [x2, y2] = gmXY(cont.latMin, cont.lngMax);
+    continents += `<rect class="gm-continent" x="${x1}" y="${y1}" width="${x2 - x1}" height="${y2 - y1}" rx="14"/>
+      <text class="gm-continent-label" x="${x1 + 6}" y="${y1 + 14}">${cont.label}</text>`;
+  });
+
+  let markers = '';
+  clusters.forEach((cl, i) => {
+    const [x, y] = gmXY(cl.lat, cl.lng);
+    const r = 9 + Math.min(cl.cats.length, 8) * 1.6;
+    const color = (CLIMATE_DEFS[cl.climate] || CLIMATE_DEFS.tropical).color;
+    markers += `<circle class="gm-marker" cx="${x}" cy="${y}" r="${r}" fill="${color}" onclick="openRegionPanel(${i})"/>
+      <text class="gm-marker-count" x="${x}" y="${y + 3}" onclick="openRegionPanel(${i})">${cl.cats.length}</text>`;
+  });
+
+  window.gmClusters = clusters;
+
+  const canvas = document.getElementById('globe-map-canvas');
+  canvas.style.width = GM_W + 'px';
+  canvas.style.height = GM_H + 'px';
+  canvas.innerHTML = `<svg width="${GM_W}" height="${GM_H}" viewBox="0 0 ${GM_W} ${GM_H}">
+    ${bands}${lines}${bandLabels}${continents}${markers}
+  </svg>`;
+
+  document.getElementById('globe-legend').innerHTML = Object.values(CLIMATE_DEFS).map(c =>
+    `<div class="globe-legend-item"><span class="globe-legend-dot" style="background:${c.color}"></span>${c.emoji} ${c.label}</div>`
+  ).join('');
+}
+
+function openRegionPanel(i) {
+  const cl = window.gmClusters[i];
+  if (!cl) return;
+  const climateInfo = CLIMATE_DEFS[cl.climate] || CLIMATE_DEFS.tropical;
+  document.getElementById('region-panel-title').textContent = cl.region;
+  document.getElementById('region-panel-sub').textContent = `${climateInfo.emoji} ${climateInfo.label} ・ ${cl.cats.length}分類 ・ ${cl.plantCount}種`;
+  document.getElementById('region-panel-list').innerHTML = cl.cats.map(c => `
+    <div class="region-panel-item" onclick="closeRegionPanel(); openCategoryCard('${c.code}');">
+      <span class="region-panel-item-name">${c.name}</span>
+      <span class="region-panel-item-count">${c.count}種 ›</span>
+    </div>`).join('');
+  document.getElementById('region-panel-overlay').classList.add('show');
+}
+
+function closeRegionPanel() { document.getElementById('region-panel-overlay').classList.remove('show'); }
+
+function showGlobe() {
+  document.getElementById('screen-top').style.display = 'none';
+  document.getElementById('screen-globe').style.display = 'block';
+  if (globeData.length === 0) loadGlobe();
+}
+
+/* ===== ⌨️ 名前当てクイズ ===== */
+let nqAllPlants = [];
+let nqCategories = [];
+let nqStats = {};
+let nqCurrentCatIndex = null;
+let nqQueue = [];
+let nqIndex = 0;
+let nqWrongThisRound = [];
+let nqCorrectThisRound = 0;
+let nqAnswered = false;
+
+function loadNQStats() {
+  try { nqStats = JSON.parse(localStorage.getItem('plant_namequiz_stats') || '{}'); } catch (e) { nqStats = {}; }
+}
+function saveNQStats() { localStorage.setItem('plant_namequiz_stats', JSON.stringify(nqStats)); }
+
+async function loadNameQuiz() {
+  try {
+    const res = await fetch('namequiz.json');
+    nqAllPlants = await res.json();
+    nqCategories = [];
+    for (let i = 0; i < nqAllPlants.length; i += 30) {
+      nqCategories.push(nqAllPlants.slice(i, i + 30));
+    }
+    loadNQStats();
+  } catch (e) {
+    console.error(e);
+  }
+}
+
+function nqNormalize(s) {
+  return (s || '').normalize('NFKC').trim().replace(/\s+/g, '').toLowerCase();
+}
+
+function nqAcceptableAnswers(name) {
+  const set = new Set([nqNormalize(name)]);
+  const m = name.match(/^(.*?)[\(（](.*?)[\)）]/);
+  if (m) { set.add(nqNormalize(m[1])); set.add(nqNormalize(m[2])); }
+  return set;
+}
+
+function nqIsWeak(no) { const s = nqStats[no]; return !!s && s.wrong >= 2; }
+
+function showNameQuizCategories() {
+  document.getElementById('screen-top').style.display = 'none';
+  document.getElementById('screen-nq-play').style.display = 'none';
+  document.getElementById('screen-nq-result').style.display = 'none';
+  document.getElementById('screen-nq-cats').style.display = 'block';
+  if (nqAllPlants.length === 0) { loadNameQuiz().then(renderNQCategories); }
+  else renderNQCategories();
+}
+
+function renderNQCategories() {
+  const el = document.getElementById('nq-cat-list');
+  el.innerHTML = nqCategories.map((cat, i) => {
+    const first = cat[0].no.replace('No.', '').replace(/^0+/, '');
+    const last = cat[cat.length - 1].no.replace('No.', '').replace(/^0+/, '');
+    const weakCount = cat.filter(p => nqIsWeak(p.no)).length;
+    return `
+      <div class="nq-cat-card" onclick="nqStartCategory(${i}, false)">
+        <div>
+          <div class="nq-cat-card-label">No.${first}〜${last}</div>
+          <div class="nq-cat-card-sub">${cat.length}種</div>
+        </div>
+        ${weakCount > 0 ? `<span class="nq-cat-card-weak">🔴苦手 ${weakCount}種</span>` : ''}
+      </div>`;
+  }).join('');
+}
+
+function nqShuffle(arr) {
+  const a = arr.slice();
+  for (let i = a.length - 1; i > 0; i--) { const j = Math.floor(Math.random() * (i + 1)); [a[i], a[j]] = [a[j], a[i]]; }
+  return a;
+}
+
+function nqStartCategory(catIndex, weakOnly) {
+  nqCurrentCatIndex = catIndex;
+  const cat = nqCategories[catIndex];
+  const source = weakOnly ? cat.filter(p => nqIsWeak(p.no)) : cat;
+  nqStartQueue(source, `No.${catIndex * 30 + 1}〜${Math.min((catIndex + 1) * 30, 300)}`);
+}
+
+function nqStartQueue(plantList, title) {
+  nqQueue = nqShuffle(plantList);
+  nqIndex = 0;
+  nqWrongThisRound = [];
+  nqCorrectThisRound = 0;
+  document.getElementById('nq-play-title').textContent = title || '名前当てクイズ';
+  document.getElementById('screen-nq-cats').style.display = 'none';
+  document.getElementById('screen-nq-result').style.display = 'none';
+  document.getElementById('screen-nq-play').style.display = 'block';
+  nqShowCurrent();
+}
+
+function nqShowCurrent() {
+  if (nqIndex >= nqQueue.length) { nqShowResult(); return; }
+  const plant = nqQueue[nqIndex];
+  nqAnswered = false;
+  document.getElementById('nq-progress').textContent = `${nqIndex + 1} / ${nqQueue.length}`;
+  document.getElementById('nq-feedback').textContent = '';
+  document.getElementById('nq-feedback').className = 'nq-feedback';
+  const input = document.getElementById('nq-input');
+  input.value = '';
+  input.className = 'nq-input';
+  input.disabled = false;
+  const btn = document.getElementById('nq-action-btn');
+  btn.textContent = 'こたえる';
+  btn.onclick = nqSubmit;
+  document.getElementById('nq-skip').style.display = 'block';
+
+  const safeName = plant.name.replace(/\//g, '／');
+  const photoEl = document.getElementById('nq-photo');
+  photoEl.innerHTML = '';
+  const img = document.createElement('img');
+  img.src = `images/${safeName}.jpg`;
+  img.alt = '植物の写真';
+  img.onerror = function () {
+    if (!this.dataset.retried) { this.dataset.retried = 'true'; this.src = `images/${safeName.normalize('NFD')}.jpg`; }
+    else { photoEl.innerHTML = '<div class="photo-placeholder">🌿</div>'; }
+  };
+  photoEl.appendChild(img);
+  setTimeout(() => input.focus(), 50);
+}
+
+function nqRecordStat(no, correct) {
+  if (!nqStats[no]) nqStats[no] = { attempts: 0, wrong: 0 };
+  nqStats[no].attempts++;
+  if (!correct) nqStats[no].wrong++; else nqStats[no].wrong = Math.max(0, nqStats[no].wrong - 1);
+  saveNQStats();
+}
+
+function nqSubmit() {
+  if (nqAnswered) return;
+  const plant = nqQueue[nqIndex];
+  const input = document.getElementById('nq-input');
+  const userAns = nqNormalize(input.value);
+  const ok = userAns.length > 0 && nqAcceptableAnswers(plant.name).has(userAns);
+  nqFinishAnswer(ok, plant);
+}
+
+function nqReveal() {
+  if (nqAnswered) return;
+  nqFinishAnswer(false, nqQueue[nqIndex]);
+}
+
+function nqFinishAnswer(ok, plant) {
+  nqAnswered = true;
+  nqRecordStat(plant.no, ok);
+  const input = document.getElementById('nq-input');
+  const fb = document.getElementById('nq-feedback');
+  input.disabled = true;
+  document.getElementById('nq-skip').style.display = 'none';
+  if (ok) {
+    nqCorrectThisRound++;
+    input.className = 'nq-input correct';
+    fb.textContent = `⭕ 正解！ ${plant.name}`;
+    fb.className = 'nq-feedback correct';
+  } else {
+    nqWrongThisRound.push(plant);
+    input.className = 'nq-input wrong';
+    fb.textContent = `❌ 正解は「${plant.name}」`;
+    fb.className = 'nq-feedback wrong';
+  }
+  const btn = document.getElementById('nq-action-btn');
+  btn.textContent = 'つぎへ';
+  btn.onclick = nqNext;
+}
+
+function nqNext() { nqIndex++; nqShowCurrent(); }
+
+function nqShowResult() {
+  document.getElementById('screen-nq-play').style.display = 'none';
+  document.getElementById('screen-nq-result').style.display = 'block';
+  const total = nqQueue.length;
+  document.getElementById('nq-score').textContent = `${nqCorrectThisRound} / ${total} 正解`;
+
+  const actions = [];
+  if (nqWrongThisRound.length > 0) {
+    actions.push(`<button class="primary" onclick="nqStartQueue(nqWrongThisRound.slice(), '間違えた${nqWrongThisRound.length}種だけ')">🔁 間違えた${nqWrongThisRound.length}種だけもう一周</button>`);
+  }
+  if (nqCurrentCatIndex !== null) {
+    actions.push(`<button onclick="nqStartCategory(nqCurrentCatIndex, false)">🔄 このカテゴリをもう一度全部</button>`);
+  }
+  actions.push(`<button onclick="showNameQuizCategories()">📋 カテゴリ一覧に戻る</button>`);
+  document.getElementById('nq-result-actions').innerHTML = actions.join('');
+
+  const wrongListEl = document.getElementById('nq-wronglist');
+  const wrongTitleEl = document.getElementById('nq-wronglist-title');
+  if (nqWrongThisRound.length > 0) {
+    wrongTitleEl.style.display = 'block';
+    wrongListEl.innerHTML = nqWrongThisRound.map(p => {
+      const safeName = p.name.replace(/\//g, '／');
+      return `
+        <div class="plant-tile">
+          <div class="plant-tile-photo">
+            <img src="images/${safeName}.jpg" alt="植物の写真" loading="lazy"
+                 onerror="if(!this.dataset.retried){this.dataset.retried='true'; this.src='images/${safeName.normalize('NFD')}.jpg';}else{this.parentNode.innerHTML='<div style=\\'font-size:26px;\\'>🌿</div>';}"
+                 style="width:100%;height:100%;object-fit:cover;">
+          </div>
+          <div class="plant-tile-name revealed">${p.no} ${p.name}</div>
+        </div>`;
+    }).join('');
+  } else {
+    wrongTitleEl.style.display = 'none';
+    wrongListEl.innerHTML = '';
+  }
+}
+
+document.getElementById('nq-input').addEventListener('keydown', e => {
+  if (e.key === 'Enter') { e.preventDefault(); if (!nqAnswered) nqSubmit(); else nqNext(); }
+});
 
 loadCSV();
 loadAtlas();
+loadGlobe();
+loadNameQuiz();
 </script>
 </body>
 </html>
